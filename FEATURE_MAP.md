@@ -14,6 +14,7 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | Workspaces + tooling | `package.json`, `tsconfig.base.json`, `biome.json`, `vitest.config.ts` (projects: core, worker, web), `apps/web/vitest.config.ts`, `.size-limit.js` (manifest-based budgets: initial/lazy/celebrate/SW/webmanifest), `*/package.json`, `package.json` `overrides` (audit: glob, esbuild) | — | ✅ |
 | Exact gz bytes per chunk vs baseline (`--save`, `--changed`) | `scripts/gz.mjs`, `scripts/gz-baseline.json` | — | ✅ |
 | Deploy pipeline (root `deploy` = check + test + worker deploy; worker `db:migrate:remote`, `db:export`) + deployed-origin smoke (public + `--auth`) | `package.json`, `worker/package.json`, `scripts/smoke.mjs` | `node scripts/smoke.mjs <ORIGIN> [--auth]` | 🟨 |
+| Local demo (fresh isolated D1 `worker/.wrangler/demo`, relative-date mock lists/tags/tasks, password `demo`, wrangler :8787 + vite :5173) | `scripts/demo.mjs`, `package.json` (`demo`) | `npm run demo` | ✅ |
 | Worker config (`global_fetch_strictly_public`, `preview_urls: false`, prod `OAUTH_REDIRECT_ALLOW`, D1/KV ids) | `worker/wrangler.jsonc`, `worker/.dev.vars.example` | — | 🟨 |
 
 ## #db — data
