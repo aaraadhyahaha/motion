@@ -10,7 +10,7 @@ import {
   type TaskUpdate,
   todayKey,
 } from '@motion/core';
-import { and, asc, desc, eq, gte, isNull, lte, type SQL, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, isNotNull, isNull, lte, type SQL, sql } from 'drizzle-orm';
 import { tasks, taskTags } from '../db/schema';
 import { AppError, notFound } from '../lib/errors';
 import { id } from '../lib/id';
@@ -151,4 +151,16 @@ export async function deleteTask(ctx: Ctx, taskId: string): Promise<void> {
   await getTask(ctx, taskId);
   const now = ctx.now();
   await ctx.db.update(tasks).set({ deletedAt: now, updatedAt: now }).where(eq(tasks.id, taskId));
+}
+
+/** Undo a soft delete (the web Undo toast). Already-live or unknown id → 404. */
+export async function restoreTask(ctx: Ctx, taskId: string): Promise<Task> {
+  const row = await ctx.db
+    .update(tasks)
+    .set({ deletedAt: null, updatedAt: ctx.now() })
+    .where(and(eq(tasks.id, taskId), isNotNull(tasks.deletedAt)))
+    .returning({ id: tasks.id })
+    .get();
+  if (!row) throw notFound('task');
+  return getTask(ctx, taskId);
 }

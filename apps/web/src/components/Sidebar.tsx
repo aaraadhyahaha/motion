@@ -9,6 +9,8 @@ const VIEWS: { href: string; label: string; icon: IconName; name: Route['name'] 
   { href: '/upcoming', label: 'Upcoming', icon: 'upcoming', name: 'upcoming' },
   { href: '/logbook', label: 'Logbook', icon: 'logbook', name: 'logbook' },
   { href: '/stats', label: 'Stats', icon: 'stats', name: 'stats' },
+  { href: '/search', label: 'Search', icon: 'search', name: 'search' },
+  { href: '/settings', label: 'Settings', icon: 'settings', name: 'settings' },
 ];
 
 const cur = (on: boolean) => (on ? ('page' as const) : undefined);

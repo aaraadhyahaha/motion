@@ -64,7 +64,7 @@
 
   /* ── Semantic colors (light, dark) ── */
   --label: light-dark(#231d16, #f3ede3); /* warm ink / warm bone */
-  --label2: light-dark(rgb(76 62 48 / 0.72), rgb(243 236 226 / 0.64));
+  --label2: light-dark(rgb(76 62 48 / 0.76), rgb(243 236 226 / 0.64));
   --label3: light-dark(rgb(76 62 48 / 0.42), rgb(243 236 226 / 0.36));
   --label4: light-dark(rgb(76 62 48 / 0.16), rgb(243 236 226 / 0.14));
 
@@ -99,7 +99,7 @@
   /* list palette — Atelier "inks" (legacy names kept; clay→red, ochre→yellow, moss→green,
      lagoon→cyan, indigo→blue (default), plum→purple) */
   --list-red: light-dark(#bd5430, #e8845f);
-  --list-yellow: light-dark(#b9821a, #e2b04f);
+  --list-yellow: light-dark(#ad7914, #e2b04f);
   --list-green: light-dark(#5b7a3a, #9cbc72);
   --list-cyan: light-dark(#2c7a76, #6dc2bb);
   --list-blue: light-dark(#4b58a6, #9aa6f0);
@@ -127,6 +127,8 @@
   --r-sheet: 24px;
   --r-pill: 999px;
   --tap: 44px;
+  --switch-w: 51px; /* HIG switch */
+  --switch-h: 31px;
   --hairline: 0.5px;
   /* layout */
   --sidebar-w: 260px;
@@ -204,6 +206,7 @@
   --dur-smooth: 550ms;
   --dur-bouncy: 600ms;
   --dur-fade: 150ms;
+  --dur-hold: 2400ms; /* celebration card dwell; not collapsed under reduced motion */
 
   --spring-snappy: var(--dur-snappy) var(--ease-spring);
   --spring-smooth: var(--dur-smooth) var(--ease-spring);

@@ -1,19 +1,16 @@
-// #task #sched quick add: live chips from core tokenize, ⌘K / N to focus, Enter → POST /api/tasks/quick.
+// #task #sched quick add: live chips from core tokenize, Enter → POST /api/tasks/quick. ⌘K / N live in keys/map.
 
 import { tokenize } from '@motion/core/quickadd';
 import { describe, parseRule } from '@motion/core/recurrence';
 import type { Agenda } from '@motion/core/schemas';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { keys } from '../data/keys';
 import { useQuickAdd } from '../data/mutations';
 import { localToday } from '../lib/format';
 import { Icon } from './Icon';
 
 type Props = { listId?: string; dueToday?: boolean };
-
-const editable = (el: EventTarget | null) =>
-  el instanceof HTMLElement && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
 
 function chipsOf(text: string): string[] {
   const t = tokenize(text);
@@ -31,20 +28,7 @@ export function QuickAdd({ listId, dueToday }: Props) {
   const qc = useQueryClient();
   const { mutate } = useQuickAdd();
   const [text, setText] = useState('');
-  const input = useRef<HTMLInputElement>(null);
   const chips = useMemo(() => chipsOf(text), [text]);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const cmdK = e.key.toLowerCase() === 'k' && (e.metaKey || e.ctrlKey);
-      const n = e.key === 'n' && !e.metaKey && !e.ctrlKey && !e.altKey && !editable(e.target);
-      if (!cmdK && !n) return;
-      e.preventDefault();
-      input.current?.focus();
-    };
-    addEventListener('keydown', onKey);
-    return () => removeEventListener('keydown', onKey);
-  }, []);
 
   const submit = () => {
     const value = text.trim();
@@ -65,7 +49,6 @@ export function QuickAdd({ listId, dueToday }: Props) {
       <Icon name="plus" size={20} className="quick-add-icon" />
       <div className="quick-add-field">
         <input
-          ref={input}
           className="quick-add-input t-body"
           value={text}
           onChange={(e) => setText(e.target.value)}

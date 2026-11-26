@@ -31,7 +31,11 @@ export function Sheet({ open, label, onRequestClose, onExited, bar, children }: 
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null;
     ref.current?.focus({ preventScroll: true });
-    return () => prev?.focus?.({ preventScroll: true });
+    // the invoking row may be gone (deleted) → land on the first row instead of <body>
+    return () =>
+      (prev?.isConnected ? prev : document.querySelector<HTMLElement>('.row-body'))?.focus?.({
+        preventScroll: true,
+      });
   }, []);
 
   const onKeyDown = (e: KeyboardEvent) => {

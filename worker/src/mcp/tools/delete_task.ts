@@ -7,7 +7,7 @@ export default defineTool({
   name: 'delete_task',
   description: 'Delete a task. Confirm with the user first.',
   input: z.object({ id: Id }),
-  annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true },
+  annotations: { destructiveHint: true, idempotentHint: true },
   run: async (ctx, a) => {
     await deleteTask(ctx, a.id);
     return { ok: true };

@@ -117,7 +117,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--s-1);
-  color: var(--label3);
+  color: var(--label2);
   transition: transform var(--spring-snappy);
 }
 .tab[aria-current="page"] {
@@ -267,7 +267,7 @@
   color: var(--label3);
 }
 .quick-add-kbd {
-  color: var(--label3);
+  color: var(--label2);
   padding-inline: var(--s-1);
 }
 @media (pointer: coarse) {
@@ -318,7 +318,7 @@
   padding-inline-end: var(--s-4);
 }
 .toast-action {
-  color: var(--tint);
+  color: var(--tint-ink);
 }
 
 /* ── Empty ── */

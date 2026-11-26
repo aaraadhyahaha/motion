@@ -25,7 +25,8 @@ Plan: `plans/2026-11-26-phase2-interface.md`. Tokens: `src/styles/tokens.css`. R
 
 - Initial JS ≤ 90 KB gz · initial CSS ≤ 15 KB · lazy JS total ≤ 45 KB · `celebrate/*` ≤ 8 KB · SW ≤ 10 KB.
 - Initial chunk may contain: React, react-query, router, shell, Today, data layer, core helpers (**no zod** — `import type` only; subpaths `@motion/core/{dates,quickadd,recurrence}`).
-- Everything else is `React.lazy`: `routes/*` (except Today), `editor/*`, `celebrate/*`.
+- Everything else is `React.lazy`: `routes/*` (except Today), `editor/*`, `celebrate/*`, `keys/*`.
+- A new lazy importer of a shared entry module can make Rolldown split it into an extra initial chunk — prefer injection/literals where it shows up. Check exact bytes: `node scripts/gz.mjs --changed` after `vite build`; `--save` to rebase.
 - Icons: `components/Icon.tsx` inline paths — no icon library.
 - Select only needed fields; paginate lists; memoize rows with stable keys.
 
@@ -38,6 +39,6 @@ Plan: `plans/2026-11-26-phase2-interface.md`. Tokens: `src/styles/tokens.css`. R
 | `editor-` | `src/editor/*` |
 | `celebrate-` | `src/celebrate/*` (own budget) |
 | `vendor-motion-` | `motion` / `framer-motion` / `motion-dom` / `motion-utils` |
-| `chunk-` | shared lazy chunks |
+| `chunk-` | shared lazy chunks (incl. `keys/listen`, `data/remove`) |
 
 Put a file in the right folder and its chunk name follows; don't rename chunks by hand.

@@ -12,9 +12,10 @@ const TaskQueryView = lazy(loaders.query);
 const Lists = lazy(loaders.lists);
 const Logbook = lazy(loaders.logbook);
 const Stats = lazy(loaders.stats);
+const Settings = lazy(loaders.settings);
 const EditorSheet = lazy(loaders.editor);
 
-function View({ route }: { route: Route }) {
+function View({ route, q }: { route: Route; q: string }) {
   switch (route.name) {
     case 'today':
       return <Today />;
@@ -30,6 +31,10 @@ function View({ route }: { route: Route }) {
       return <Logbook />;
     case 'stats':
       return <Stats />;
+    case 'search':
+      return <TaskQueryView key="search" search={q} />;
+    case 'settings':
+      return <Settings />;
     default:
       return <Empty icon="close" title="Page not found" />;
   }
@@ -52,7 +57,7 @@ export function App() {
   return (
     <Shell route={route} quickAdd={quick}>
       <Suspense fallback={null}>
-        <View route={route} />
+        <View route={route} q={params.get('q') ?? ''} />
       </Suspense>
       {taskId && (
         <Suspense fallback={null}>

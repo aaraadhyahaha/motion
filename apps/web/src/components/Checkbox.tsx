@@ -1,4 +1,4 @@
-// #ui #anim round checkbox: CSS spring fill + wipe-reveal check (transform only) + haptic tick.
+// #ui #anim round checkbox: CSS spring fill + wipe-reveal check (transform only) (haptic lives in celebrate/run).
 import { Icon } from './Icon';
 
 type Props = { checked: boolean; onChange: (next: boolean) => void; label: string };
@@ -11,10 +11,7 @@ export function Checkbox({ checked, onChange, label }: Props) {
       aria-checked={checked}
       aria-label={label}
       className="check"
-      onClick={() => {
-        if (!checked) navigator.vibrate?.(10);
-        onChange(!checked);
-      }}
+      onClick={() => onChange(!checked)}
     >
       <span className="check-ring" aria-hidden>
         <span className="check-fill">

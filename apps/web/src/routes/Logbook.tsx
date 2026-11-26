@@ -43,7 +43,9 @@ export default function Logbook() {
               keepDone
             />
           ))}
-          {q.isSuccess && !groups.size && <Empty icon="logbook" title="Nothing finished yet" />}
+          {q.isSuccess && !groups.size && (
+            <Empty icon="logbook" title="Nothing finished yet." hint="Ticked tasks are kept here, by day." />
+          )}
           <div ref={more} aria-hidden />
         </>
       )}

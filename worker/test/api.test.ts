@@ -16,7 +16,7 @@ const call = (method: string, path: string, body?: unknown) =>
 const json = async (res: Response) => (await res.json()) as Record<string, any>;
 
 describe('REST', () => {
-  it('task lifecycle: create → list → patch → complete → undo → delete', async () => {
+  it('task lifecycle: create → list → patch → complete → undo → delete → restore', async () => {
     const created = await call('POST', '/tasks', {
       title: 'Buy milk',
       dueDate: '2030-01-02',
@@ -32,6 +32,8 @@ describe('REST', () => {
     expect(await json(await call('POST', `/tasks/${t.id}/uncomplete`))).toMatchObject({ done: false });
     expect((await call('DELETE', `/tasks/${t.id}`)).status).toBe(204);
     expect((await call('GET', `/tasks/${t.id}`)).status).toBe(404);
+    expect(await json(await call('POST', `/tasks/${t.id}/restore`))).toMatchObject({ title: 'Buy oat milk' });
+    expect((await call('POST', `/tasks/${t.id}/restore`)).status).toBe(404);
   });
 
   it('validation and error mapping', async () => {

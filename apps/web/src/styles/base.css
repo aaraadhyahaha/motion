@@ -80,7 +80,7 @@ button {
   cursor: pointer;
 }
 a {
-  color: var(--tint);
+  color: var(--tint-ink);
   text-decoration: none;
 }
 ul,
@@ -156,7 +156,7 @@ p {
   color: var(--on-tint);
 }
 .btn-plain {
-  color: var(--tint);
+  color: var(--tint-ink);
 }
 .btn-icon {
   padding: 0;

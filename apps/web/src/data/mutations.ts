@@ -3,26 +3,26 @@ import type { QuickAdd, Task, TaskUpdate } from '@motion/core/schemas';
 import { type QueryClient, type QueryKey, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '../ui/store';
 import { api } from './api';
-import { patchTask, removeTask } from './cache';
+import { patchTask } from './cache';
 import { keys, TASK_CACHES } from './keys';
-import { markDeleted, markSeen, pokeSync } from './sync';
+import { markSeen, pokeSync } from './sync';
 
 type Snapshot = [QueryKey, unknown][];
 
-async function optimistic(qc: QueryClient, edit: (d: unknown) => unknown): Promise<Snapshot> {
+export async function optimistic(qc: QueryClient, edit: (d: unknown) => unknown): Promise<Snapshot> {
   await Promise.all(TASK_CACHES.map((k) => qc.cancelQueries({ queryKey: k })));
   const snap = TASK_CACHES.flatMap((k) => qc.getQueriesData({ queryKey: k }));
   for (const k of TASK_CACHES) qc.setQueriesData({ queryKey: k }, edit);
   return snap;
 }
 
-function rollback(qc: QueryClient, snap: Snapshot | undefined, msg: string) {
+export function rollback(qc: QueryClient, snap: Snapshot | undefined, msg: string) {
   for (const [k, d] of snap ?? []) qc.setQueryData(k, d);
   toast(msg);
 }
 
 /** Server copy wins everywhere; remember it so the poller ignores our own echo. */
-function settle(qc: QueryClient, t: Task, invalidate: readonly QueryKey[]) {
+export function settle(qc: QueryClient, t: Task, invalidate: readonly QueryKey[]) {
   markSeen(t.id, t.updatedAt);
   for (const k of TASK_CACHES) qc.setQueriesData({ queryKey: k }, (d: unknown) => patchTask(d, t.id, t));
   for (const k of invalidate) void qc.invalidateQueries({ queryKey: k });
@@ -47,7 +47,10 @@ export function useComplete() {
     mutationFn: (id: string) => api<Task>('POST', `/tasks/${id}/complete`),
     onMutate: (id) => {
       toast('Done. Nicely handled.', { label: 'Undo', run: () => undo.mutate(id) });
-      return optimistic(qc, (d) => patchTask(d, id, { done: true, doneAt: Date.now() }));
+      const snap = optimistic(qc, (d) => patchTask(d, id, { done: true, doneAt: Date.now() }));
+      // #anim lazy celebrate/* reads the patched caches; first completion fetches the chunk
+      void snap.then(() => import('../celebrate/run')).then((m) => m.run(qc, id));
+      return snap;
     },
     onError: (_e, _id, snap) => rollback(qc, snap, 'Couldn’t complete task'),
     // recurring tasks come back rolled forward (not done) and reappear on their new day
@@ -63,20 +66,6 @@ export function useUpdateTask() {
     onMutate: ({ id, patch }) => optimistic(qc, (d) => patchTask(d, id, nullsToUndefined(patch))),
     onError: (_e, _v, snap) => rollback(qc, snap, 'Couldn’t save changes'),
     onSuccess: (t) => settle(qc, t, [keys.agendaAll, keys.tasksAll]),
-  });
-}
-
-export function useDeleteTask() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => api<void>('DELETE', `/tasks/${id}`),
-    onMutate: (id) => optimistic(qc, (d) => removeTask(d, id)),
-    onError: (_e, _id, snap) => rollback(qc, snap, 'Couldn’t delete task'),
-    onSuccess: (_r, id) => {
-      markDeleted(id);
-      void qc.invalidateQueries({ queryKey: keys.statsAll });
-      pokeSync();
-    },
   });
 }
 

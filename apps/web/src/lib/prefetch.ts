@@ -5,7 +5,12 @@ export const loaders = {
   lists: () => import('../routes/Lists'),
   logbook: () => import('../routes/Logbook'),
   stats: () => import('../routes/Stats'),
+  // Settings rides in the Lists chunk (same phone tab; saves a chunk's import overhead)
+  settings: () => import('../routes/Lists').then((m) => ({ default: m.Settings })),
   editor: () => import('../editor/EditorSheet'),
+  celebrate: () => import('../celebrate/run'),
+  // side effect: installs the one keydown listener (shortcuts are live from first idle)
+  keys: () => import('../keys/listen'),
 };
 
 let done = false;

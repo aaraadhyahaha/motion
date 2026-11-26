@@ -6,13 +6,17 @@ import { type CSSProperties, useCallback, useEffect, useRef, useState } from 're
 import '../styles/sheet.css';
 import { Icon } from '../components/Icon';
 import { keys } from '../data/keys';
-import { useDeleteTask, useUpdateTask } from '../data/mutations';
+import { useUpdateTask } from '../data/mutations';
 import { useLists, useTask } from '../data/queries';
+import { useDeleteTask } from '../data/remove';
 import { localToday } from '../lib/format';
 import { DateFields } from './DateFields';
 import { RepeatPicker } from './RepeatPicker';
 import { Sheet } from './Sheet';
 import { TagInput } from './TagInput';
+
+const TRASH =
+  'M4 7h16M9.5 7V4.5h5V7M6.5 7l.9 12.1a1.5 1.5 0 0 0 1.5 1.4h6.2a1.5 1.5 0 0 0 1.5-1.4L17.5 7M10 11v6M14 11v6';
 
 const FIELDS = [
   'title',
@@ -135,7 +139,7 @@ export default function EditorSheet({ id, onClose }: { id: string; onClose: () =
         bar={
           <header className="sheet-bar">
             <button type="button" className="btn btn-plain sheet-del" onClick={remove} disabled={!d}>
-              <Icon name="trash" label="Delete task" />
+              <Icon d={TRASH} label="Delete task" />
             </button>
             <button type="button" className="btn btn-plain" onClick={close}>
               Done

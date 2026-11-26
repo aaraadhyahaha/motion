@@ -30,7 +30,11 @@ export default function Upcoming() {
             <TaskList key={day} tasks={tasks} title={i ? fmtDayLong(day) : 'Tomorrow'} sticky />
           ))}
           {!isPending && !any && (
-            <Empty icon="upcoming" title="Nothing scheduled" hint="Two quiet weeks ahead." />
+            <Empty
+              icon="upcoming"
+              title="Two quiet weeks."
+              hint="Anything with a date lands here. Press N to add one."
+            />
           )}
         </>
       )}

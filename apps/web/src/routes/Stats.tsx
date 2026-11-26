@@ -36,7 +36,10 @@ export default function Stats() {
   return (
     <>
       <PageHeader title="Stats" />
-      {s && (
+      {s && !s.total && (
+        <Empty icon="stats" title="Tiles at zero." hint="Finish one task and the streak begins." />
+      )}
+      {!!s?.total && (
         <>
           <div className="tiles">
             <Tile label="Streak" value={s.streak} hint={`Best ${s.best}`} />

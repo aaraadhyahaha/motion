@@ -23,9 +23,13 @@ const preloadInter = (): Plugin => ({
 
 // #perf stable chunk names so `.size-limit.js` can classify them:
 // entry-* (initial) · route-* · editor-* · celebrate-* · vendor-motion-* · chunk-* (shared)
-const group = (id: string | null | undefined) => {
-  const m = id?.match(/\/src\/(routes|editor|celebrate)\//);
-  return m ? (m[1] === 'routes' ? 'route' : m[1]) : 'chunk';
+// A shared chunk (no facade) whose modules all live in celebrate/ still counts as celebrate-*.
+const group = (c: { facadeModuleId: string | null; moduleIds: string[] }) => {
+  const dir = (id: string) => id.match(/\/src\/(routes|editor|celebrate)\//)?.[1];
+  const m = c.facadeModuleId
+    ? dir(c.facadeModuleId)
+    : c.moduleIds.every((i) => dir(i) === 'celebrate') && 'celebrate';
+  return m ? (m === 'routes' ? 'route' : m) : 'chunk';
 };
 
 // #pwa precache = app shell only: entry + its static imports + their CSS (from Vite's manifest, same
@@ -106,13 +110,14 @@ export default defineConfig({
   build: {
     target: 'es2022',
     manifest: true,
+    // #perf JS deps of lazy chunks load on demand (idle prefetch warms them); only CSS stays in the
+    // preload lists so code-split CSS still arrives with its chunk. Cuts per-import dep arrays from entry.
+    modulePreload: { resolveDependencies: (_f, deps) => deps.filter((d) => d.endsWith('.css')) },
     rollupOptions: {
       output: {
         entryFileNames: 'assets/entry-[hash].js',
         chunkFileNames: (c) =>
-          c.name.startsWith('vendor-')
-            ? 'assets/[name]-[hash].js'
-            : `assets/${group(c.facadeModuleId)}-[name]-[hash].js`,
+          c.name.startsWith('vendor-') ? 'assets/[name]-[hash].js' : `assets/${group(c)}-[name]-[hash].js`,
         assetFileNames: 'assets/[name]-[hash][extname]',
         // only motion's own packages — never its deps (react), which must stay in entry
         codeSplitting: {

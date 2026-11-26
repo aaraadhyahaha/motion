@@ -1,9 +1,14 @@
 // #list #ui phone Lists tab: inset groups of lists (color dots), tags, Logbook link. 44px rows. Lazy chunk.
 import type { CSSProperties, ReactNode } from 'react';
+import { Empty } from '../components/Empty';
 import { Icon } from '../components/Icon';
 import { PageHeader } from '../components/PageHeader';
 import { useLists, useTags } from '../data/queries';
 import { Link } from '../lib/router';
+
+export { default as Settings } from './Settings';
+
+const CHEVRON = 'M9 5l7 7-7 7';
 
 function Item({ href, lead, label }: { href: string; lead: ReactNode; label: string }) {
   return (
@@ -11,7 +16,7 @@ function Item({ href, lead, label }: { href: string; lead: ReactNode; label: str
       <Link href={href} className="inset-item t-body">
         {lead}
         <span className="inset-label">{label}</span>
-        <Icon name="chevron" size={16} className="inset-chevron" />
+        <Icon d={CHEVRON} size={16} className="inset-chevron" />
       </Link>
     </li>
   );
@@ -58,11 +63,20 @@ export default function Lists() {
           </ul>
         </section>
       )}
+      {lists?.every((l) => l.id === 'inbox') && tags?.length === 0 && (
+        <Empty icon="lists" title="No lists yet." hint="Type #name in quick add to start one." />
+      )}
       <ul className="inset-group">
+        <Item href="/search" label="Search" lead={<Icon name="search" size={20} className="inset-icon" />} />
         <Item
           href="/logbook"
           label="Logbook"
           lead={<Icon name="logbook" size={20} className="inset-icon" />}
+        />
+        <Item
+          href="/settings"
+          label="Settings"
+          lead={<Icon name="settings" size={20} className="inset-icon" />}
         />
       </ul>
     </>

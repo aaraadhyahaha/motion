@@ -29,3 +29,16 @@ export async function purge(req: APIRequestContext, q: string) {
   const { items } = (await r.json()) as { items: Task[] };
   for (const t of items) await req.delete(`${API}/tasks/${t.id}`);
 }
+
+/** Delete every open task on Today (overdue + due today) so "Today's done" is reachable. */
+export async function clearToday(req: APIRequestContext) {
+  const d = await today(req);
+  const a = (await (await req.get(`${API}/agenda?days=1`)).json()) as {
+    overdue: Task[];
+    days: Record<string, Task[]>;
+  };
+  for (const t of [...a.overdue, ...(a.days[d] ?? [])]) await req.delete(`${API}/tasks/${t.id}`);
+}
+
+/** True once the idle-loaded keyboard chunk has installed its listener. */
+export const keysReady = `'keys' in document.documentElement.dataset`;

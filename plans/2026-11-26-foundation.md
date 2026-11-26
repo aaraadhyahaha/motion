@@ -189,7 +189,8 @@ motion/
 2. **Interface ✅ done (2026-11-26):** detail in `plans/2026-11-26-phase2-interface.md`. HIG tokens, shell, Today + lazy views, motion sheet editor, PWA; check + 76 unit + 18 e2e green. Budgets (gz): initial JS 89.69/90 KB · CSS 4.3/15 KB · lazy 41.56/45 KB · SW 8.73/10 KB · manifest 201 B/1 KB.
    - Tokens, typography and the app shell (sidebar and tab bar), then the task list, editor sheet and the views you choose. Dark mode, PWA manifest and offline cache.
 3. **MCP and auth ✅ done (2026-11-26):** detail in `plans/2026-11-26-phase3-mcp-auth.md`. OAuth 2.1 (workers-oauth-provider, PKCE/DCR) + password login + cookie session on `/api`; hand-rolled stateless MCP with 13 tools over services; SSR login/consent; 92 unit + 21 e2e green; initial JS 89.89/90 KB.
-4. **Celebrations and polish:** completion animations, empty states, keyboard shortcuts, accessibility pass (VoiceOver labels, focus rings, contrast).
+4. **Celebrations and polish ✅ done (2026-11-26):** detail in `plans/2026-11-26-phase4-polish.md`. Lazy celebrations (2.16/8 KB), empty states, Search + Settings/logout, idle-loaded shortcuts, a11y pass (contrast test + axe), npm audit 0, tools/list −23%; 219 unit + 61 e2e green; initial JS 89.89 → 89.80 KB.
+   - Completion animations, empty states, keyboard shortcuts, accessibility pass (VoiceOver labels, focus rings, contrast).
 5. **Deploy:** `wrangler d1 create`, set secrets, `wrangler deploy`, then connect to claude.ai.
 
 ## 8. Feature questions (I'll ask these after you approve)

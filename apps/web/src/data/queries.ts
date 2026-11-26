@@ -12,9 +12,10 @@ export const useAgenda = (days = 14) =>
     queryFn: ({ signal }) => api<Agenda>('GET', `/agenda${qs({ days })}`, undefined, signal),
   });
 
-export const useTasks = (f: TaskFilter) =>
+export const useTasks = (f: TaskFilter, enabled = true) =>
   useInfiniteQuery({
     queryKey: keys.tasks(f),
+    enabled,
     initialPageParam: undefined as string | undefined,
     queryFn: ({ pageParam, signal }) =>
       api<Page<Task>>('GET', `/tasks${qs({ ...f, cursor: pageParam, limit: PAGE })}`, undefined, signal),

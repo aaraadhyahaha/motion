@@ -1,0 +1,103 @@
+/* #ui lazy views: search field, settings (switch, log out), keyboard help dialog. Tokens only. */
+.search {
+  margin: 0 var(--s-4) var(--s-4);
+}
+.search-input {
+  width: 100%;
+  min-height: var(--tap);
+  padding-inline: var(--s-4);
+  border-radius: var(--r-button);
+  background: var(--fill3);
+  color: var(--label);
+  border: 0;
+}
+.search-input::placeholder {
+  color: var(--label3);
+}
+.search-input:focus-visible {
+  outline: 0;
+  box-shadow: var(--focus-ring);
+}
+
+button.inset-item {
+  width: 100%;
+  text-align: start;
+}
+.settings-note {
+  margin: var(--s-2) var(--s-8) 0;
+  color: var(--label2);
+}
+.settings-logout {
+  justify-content: center;
+  color: var(--red);
+}
+.switch {
+  appearance: none;
+  flex: none;
+  position: relative;
+  width: var(--switch-w);
+  height: var(--switch-h);
+  border-radius: var(--r-pill);
+  background: var(--fill);
+  transition: background-color var(--fade);
+}
+/* the knob moves with transform; the 44pt target is the whole row (label) */
+.switch::before {
+  content: "";
+  position: absolute;
+  --gap: calc(var(--s-1) / 2);
+  inset: var(--gap) auto var(--gap) var(--gap);
+  aspect-ratio: 1;
+  border-radius: var(--r-pill);
+  background: var(--bg);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--spring-snappy);
+}
+.switch:focus-visible {
+  border-radius: var(--r-pill);
+}
+.switch:checked {
+  background: var(--green);
+}
+.switch:checked::before {
+  transform: translateX(calc(var(--switch-w) - var(--switch-h)));
+}
+
+.help {
+  margin: auto;
+  width: min(30rem, calc(100% - 2 * var(--s-4)));
+  padding: var(--s-6);
+  border: 0;
+  border-radius: var(--r-sheet);
+  background: var(--bg3);
+  color: var(--label);
+  box-shadow: var(--shadow-card);
+}
+.help[open] {
+  animation: help-in var(--spring-snappy);
+}
+.help::backdrop {
+  background: var(--scrim);
+}
+.help dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-2) var(--s-4);
+  margin-block: var(--s-4) var(--s-6);
+}
+.help dt {
+  color: var(--tint-ink);
+}
+.help dd {
+  color: var(--label2);
+}
+.help form {
+  display: flex;
+  justify-content: flex-end;
+}
+@keyframes help-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}

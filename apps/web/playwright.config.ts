@@ -28,6 +28,7 @@ export default defineConfig({
     {
       name: 'phone',
       dependencies: ['setup'],
+      testIgnore: /pwa\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 393, height: 852 },
@@ -38,7 +39,20 @@ export default defineConfig({
     {
       name: 'desktop',
       dependencies: ['setup'],
+      testIgnore: /pwa\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 800 }, storageState: AUTH_STATE },
+    },
+    // built app served by the worker (same origin), SW allowed — needs `vite build` first (test:e2e does it)
+    {
+      name: 'pwa',
+      dependencies: ['setup'],
+      testMatch: /pwa\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'http://localhost:8787',
+        serviceWorkers: 'allow',
+        storageState: AUTH_STATE,
+      },
     },
   ],
   webServer: [

@@ -46,8 +46,11 @@ describe('MCP protocol', () => {
     expect((await send('tools/call', { name: 'nope' })).error?.code).toBe(-32602);
   });
 
-  it('tools/list: every tool has an object JSON schema, no $schema noise', async () => {
+  it('tools/list: every tool has an object JSON schema, compact (no $schema/anyOf/regex noise)', async () => {
     const { tools } = (await send('tools/list')).result;
+    // token budget for the whole list: 6319 → 4858 chars (Phase 4 compaction)
+    expect(JSON.stringify(tools).length).toBeLessThanOrEqual(4900);
+    expect(JSON.stringify(tools)).not.toMatch(/anyOf|pattern|maxLength|9007199254740991/);
     expect(tools.map((t: { name: string }) => t.name).sort()).toEqual([
       'complete_task',
       'create_list',

@@ -5,7 +5,12 @@ import { Icon, type IconName } from './Icon';
 const TABS: { href: string; label: string; icon: IconName; on: Route['name'][] }[] = [
   { href: '/', label: 'Today', icon: 'today', on: ['today'] },
   { href: '/upcoming', label: 'Upcoming', icon: 'upcoming', on: ['upcoming'] },
-  { href: '/lists', label: 'Lists', icon: 'lists', on: ['lists', 'list', 'tag', 'logbook'] },
+  {
+    href: '/lists',
+    label: 'Lists',
+    icon: 'lists',
+    on: ['lists', 'list', 'tag', 'logbook', 'search', 'settings'],
+  },
   { href: '/stats', label: 'Stats', icon: 'stats', on: ['stats'] },
 ];
 

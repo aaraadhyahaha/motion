@@ -1,0 +1,62 @@
+{
+  "celebrate-sound": {
+    "gz": 385,
+    "initial": false
+  },
+  "chunk-api": {
+    "gz": 8805,
+    "initial": true
+  },
+  "chunk-dates": {
+    "gz": 264,
+    "initial": false
+  },
+  "chunk-listen": {
+    "gz": 1622,
+    "initial": false
+  },
+  "chunk-remove": {
+    "gz": 389,
+    "initial": false
+  },
+  "chunk-useSentinel": {
+    "gz": 265,
+    "initial": false
+  },
+  "vendor-motion": {
+    "gz": 33517,
+    "initial": false
+  },
+  "entry": {
+    "gz": 80990,
+    "initial": true
+  },
+  "celebrate-run": {
+    "gz": 1772,
+    "initial": false
+  },
+  "editor-EditorSheet": {
+    "gz": 4267,
+    "initial": false
+  },
+  "route-Lists": {
+    "gz": 1058,
+    "initial": false
+  },
+  "route-Logbook": {
+    "gz": 668,
+    "initial": false
+  },
+  "route-Stats": {
+    "gz": 1147,
+    "initial": false
+  },
+  "route-TaskQueryView": {
+    "gz": 1020,
+    "initial": false
+  },
+  "route-Upcoming": {
+    "gz": 572,
+    "initial": false
+  }
+}

@@ -8,7 +8,7 @@ import {
 } from 'react';
 
 export type Route =
-  | { name: 'today' | 'upcoming' | 'lists' | 'logbook' | 'stats' | 'notFound' }
+  | { name: 'today' | 'upcoming' | 'lists' | 'logbook' | 'stats' | 'search' | 'settings' | 'notFound' }
   | { name: 'list'; id: string }
   | { name: 'tag'; tag: string };
 
@@ -18,6 +18,8 @@ const STATIC: Record<string, Route['name']> = {
   '/lists': 'lists',
   '/logbook': 'logbook',
   '/stats': 'stats',
+  '/search': 'search',
+  '/settings': 'settings',
 };
 
 /** Pure path → route. */

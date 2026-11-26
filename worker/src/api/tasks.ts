@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import { body, parse } from '../lib/validate';
 import { completeTask, uncompleteTask } from '../services/complete';
 import { quickAdd } from '../services/quickadd';
-import { createTask, deleteTask, getTask, listTasks, updateTask } from '../services/tasks';
+import { createTask, deleteTask, getTask, listTasks, restoreTask, updateTask } from '../services/tasks';
 import type { AppEnv } from './types';
 
 export const tasksApi = new Hono<AppEnv>()
@@ -18,5 +18,6 @@ export const tasksApi = new Hono<AppEnv>()
     await deleteTask(c.var.ctx, c.req.param('id'));
     return c.body(null, 204);
   })
+  .post('/:id/restore', async (c) => c.json(await restoreTask(c.var.ctx, c.req.param('id'))))
   .post('/:id/complete', async (c) => c.json(await completeTask(c.var.ctx, c.req.param('id'))))
   .post('/:id/uncomplete', async (c) => c.json(await uncompleteTask(c.var.ctx, c.req.param('id'))));

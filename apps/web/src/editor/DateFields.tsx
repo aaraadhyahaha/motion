@@ -3,6 +3,8 @@ import { addDays, type Day, dayOfWeek } from '@motion/core/dates';
 import { Icon } from '../components/Icon';
 import { fmtDuration } from '../lib/format';
 
+const CLOCK = 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2';
+
 type Value = { dueDate?: string; dueTime?: string; durationMin?: number };
 type Props = Value & { today: Day; onChange: (v: Value) => void };
 
@@ -48,7 +50,7 @@ export function DateFields({ today, dueDate, dueTime, durationMin, onChange }: P
           />
         </label>
         <label className="ed-row">
-          <Icon name="clock" className="ed-icon" />
+          <Icon d={CLOCK} className="ed-icon" />
           <span className="ed-label">Time</span>
           <input
             type="time"
