@@ -1,9 +1,16 @@
-// #ui #auth Settings: completion sound (per device), shortcuts sheet, log out (plain form POST — 0 JS). Lazy chunk.
+// #ui #auth Settings: completion sound (per device), shortcuts sheet, log out (form POST; first clears the SW `api` cache so no task data stays on the device). Lazy chunk.
 import { useState } from 'react';
 import { setSound, soundOn } from '../celebrate/sound';
 import { PageHeader } from '../components/PageHeader';
 import { showHelp } from '../keys/listen';
 import '../styles/views.css';
+
+const logout = (e: React.FormEvent<HTMLFormElement>) => {
+  const f = e.currentTarget;
+  e.preventDefault();
+  // `api` = runtime cache name in vite.config.ts; logout must not wait on (or fail with) the cache
+  void (self.caches?.delete('api') ?? Promise.resolve()).finally(() => f.submit());
+};
 
 export default function Settings() {
   const [sound, set] = useState(soundOn);
@@ -43,7 +50,7 @@ export default function Settings() {
         </ul>
       </section>
       <section className="task-section">
-        <form method="post" action="/oauth/logout" className="inset-group">
+        <form method="post" action="/oauth/logout" className="inset-group" onSubmit={logout}>
           <button type="submit" className="inset-item t-body settings-logout">
             Log out
           </button>

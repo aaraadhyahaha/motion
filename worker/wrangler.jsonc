@@ -4,6 +4,10 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-11-20",
   "minify": true,
+  // CIMD: the OAuth provider may fetch client-supplied metadata URLs → public internet only (SSRF guard)
+  "compatibility_flags": ["global_fetch_strictly_public"],
+  // version preview URLs would be a second origin/issuer on the same D1 + KV
+  "preview_urls": false,
   "observability": { "enabled": true },
   // Same origin for PWA + API + OAuth (cookie session). Worker-owned paths run before the SPA fallback.
   "assets": {
@@ -11,9 +15,10 @@
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/*", "/mcp", "/mcp/*", "/oauth/*", "/authorize", "/token", "/.well-known/*"]
   },
+  // prod values; local dev adds the Inspector origin via .dev.vars (tests: vitest.config bindings)
   "vars": {
     "DEFAULT_TZ": "UTC",
-    "OAUTH_REDIRECT_ALLOW": "https://claude.ai,https://claude.com,http://localhost:6274"
+    "OAUTH_REDIRECT_ALLOW": "https://claude.ai,https://claude.com"
   },
   "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "local-dev-placeholder" }],
   "d1_databases": [

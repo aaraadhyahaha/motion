@@ -7,7 +7,9 @@
     "typecheck": "tsc -p .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply motion --local",
-    "deploy": "wrangler deploy",
+    "deploy": "test -f ../apps/web/dist/index.html && test -f ../apps/web/dist/_headers || { echo 'build the web app first (root: npm run deploy)'; exit 1; }; wrangler deploy",
+    "db:migrate:remote": "wrangler d1 migrations apply motion --remote",
+    "db:export": "mkdir -p ../backups && wrangler d1 export motion --remote --output ../backups/$(date +%F-%H%M%S).sql",
     "auth:hash": "node scripts/hash-password.mjs"
   },
   "dependencies": {

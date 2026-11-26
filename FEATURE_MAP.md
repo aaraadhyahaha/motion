@@ -13,6 +13,8 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | Claude settings | `.claude/settings.json` | — | ✅ |
 | Workspaces + tooling | `package.json`, `tsconfig.base.json`, `biome.json`, `vitest.config.ts` (projects: core, worker, web), `apps/web/vitest.config.ts`, `.size-limit.js` (manifest-based budgets: initial/lazy/celebrate/SW/webmanifest), `*/package.json`, `package.json` `overrides` (audit: glob, esbuild) | — | ✅ |
 | Exact gz bytes per chunk vs baseline (`--save`, `--changed`) | `scripts/gz.mjs`, `scripts/gz-baseline.json` | — | ✅ |
+| Deploy pipeline (root `deploy` = check + test + worker deploy; worker `db:migrate:remote`, `db:export`) + deployed-origin smoke (public + `--auth`) | `package.json`, `worker/package.json`, `scripts/smoke.mjs` | `node scripts/smoke.mjs <ORIGIN> [--auth]` | 🟨 |
+| Worker config (`global_fetch_strictly_public`, `preview_urls: false`, prod `OAUTH_REDIRECT_ALLOW`, D1/KV ids) | `worker/wrangler.jsonc`, `worker/.dev.vars.example` | — | 🟨 |
 
 ## #db — data
 
@@ -49,7 +51,8 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | MCP tools (13, one per file, thin over services; registry `index.ts`) | `worker/src/mcp/tools/*.ts` | `worker/test/mcp.test.ts` | ✅ |
 | Reschedule service (ISO or NL `when`) | `worker/src/services/reschedule.ts` | `worker/test/mcp.test.ts` | ✅ |
 | OAuth 2.1 provider wiring (PKCE S256, DCR `/oauth/register`, `/authorize`, `/token`, RFC 8414/9728 metadata; one provider per origin) | `worker/src/index.ts` | `worker/test/auth.test.ts` | ✅ |
-| Owner login/logout + consent (redirect allowlist, CSRF, rate limit, Referer `next`) | `worker/src/auth/routes.ts` | `worker/test/auth.test.ts` | ✅ |
+| Owner login/logout + consent (redirect allowlist, CSRF, rate limit per IP + global 30/15 min `rl:*`, fail closed without `cf-connecting-ip` on https, Referer `next`) | `worker/src/auth/routes.ts` | `worker/test/auth.test.ts`, `worker/test/prod.test.ts` | ✅ |
+| Security headers on worker responses (https only: HSTS, nosniff, Referrer-Policy; HTML + DENY; route values win) | `worker/src/lib/headers.ts`, `worker/src/index.ts` | `worker/test/prod.test.ts` | ✅ |
 | SSR auth pages (Atelier tokens inlined, no JS, strict CSP) | `worker/src/auth/pages.ts` | `worker/test/auth.test.ts` | ✅ |
 | Cookie session + `/api` guard (KV `sess:*`, Sec-Fetch-Site/Origin CSRF) | `worker/src/auth/session.ts`, `worker/src/api/index.ts` | `worker/test/auth.test.ts` | ✅ |
 | Password hash (PBKDF2, WebCrypto) + `auth:hash` script | `worker/src/auth/password.ts`, `worker/scripts/hash-password.mjs`, `worker/.dev.vars.example` | `worker/test/auth.test.ts` | ✅ |
@@ -88,7 +91,10 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | Completion celebration (pure `decide`: burst / Today's done / streak milestones; pooled canvas, rAF only while alive; CSS card; WebAudio chime, off by default; reduced-motion fade) — triggered from `useComplete` | `apps/web/src/celebrate/{decide,particles,sound,run}.ts`, `apps/web/src/styles/celebrate.css` | `apps/web/src/celebrate/{decide,particles}.test.ts`, `apps/web/e2e/celebrate.spec.ts` | ✅ |
 | Empty states (Atelier copy per view; inline SVG/CSS only) | `apps/web/src/components/Empty.tsx`, `apps/web/src/routes/*` | `apps/web/e2e/empty.spec.ts` | ✅ |
 | Accessibility (contrast of every token pair, axe on every view light/dark, 44pt targets, focus return) | `apps/web/src/styles/tokens.css`, `apps/web/src/editor/Sheet.tsx` | `apps/web/src/styles/contrast.test.ts`, `apps/web/e2e/a11y.spec.ts` | ✅ |
-| PWA manifest + SW (precache shell · CacheFirst `/assets` · NetworkFirst `/api` GET · nav denylist api/mcp/oauth/authorize/token/.well-known) · dev proxy of worker paths | `apps/web/vite.config.ts`, `apps/web/index.html` (metas), `apps/web/public/icons/*` | `apps/web/e2e/pwa.spec.ts` (`pwa` project: built app on :8787, SW allowed) | ✅ |
+| PWA manifest + SW (precache shell · CacheFirst `/assets` · NetworkFirst `/api` GET · nav denylist api/mcp/oauth/authorize/token/.well-known · `clientsClaim`) · dev proxy of worker paths | `apps/web/vite.config.ts`, `apps/web/index.html` (metas), `apps/web/public/icons/*` | `apps/web/e2e/pwa.spec.ts` (`pwa` project: built app on :8787, SW allowed) | ✅ |
+| Static security headers + CSP (`securityHeaders()` plugin → `dist/_headers`, sha256 of inline SW registration) · `.vite/` not served | `apps/web/vite.config.ts`, `apps/web/public/.assetsignore` | `apps/web/e2e/prod/pwa.spec.ts` | ✅ |
+| PWA on the deployed origin, logged out (first visit SW-controlled, offline SPA, denylist, headers) | `apps/web/e2e/prod/{prod.config,pwa.spec}.ts` | `PWA_URL=<ORIGIN> npm run test:prod -w @motion/web` | ✅ |
+| Logout clears SW `api` cache before the form POST | `apps/web/src/routes/Settings.tsx` | — | ✅ |
 | E2E smoke + screenshots + auth (setup project logs in → storageState; isolated D1 `worker/.wrangler/e2e`, wrangler :8787 + vite :5173, phone/desktop, SW blocked; shots → `e2e/shots/` gitignored) | `apps/web/playwright.config.ts`, `apps/web/e2e/{auth.setup,auth.spec,auth}.ts`, `apps/web/e2e/{seed,smoke.spec,shots.spec}.ts` (seed: `clearToday`, `keysReady`), `apps/web/e2e/tsconfig.json` | `npm run test:e2e -w @motion/web` | ✅ |
 
 ## #sched / #recur

@@ -10,3 +10,5 @@ playwright-report/
 test-results/
 apps/web/e2e/shots/
 apps/web/e2e/.auth.json
+backups/
+.wrangler-dry/

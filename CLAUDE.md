@@ -19,8 +19,8 @@ Full plan: `plans/2026-11-26-foundation.md`. Decisions: `docs/DECISIONS.md`.
 - `npm run test -- <path>` — run ONE test file; full suite only when asked
 - `npm run typecheck` · `npm run check` (typecheck + lint + size-limit)
 - `npm run db:generate` · `npm run db:migrate` (local D1)
-- `npm run deploy` — ask before running
-- `npm run lint` (Biome). Root `deploy` is blocked until Phase 5 (deploy).
+- `npm run deploy` — check + test + worker deploy; ask before running (runbook: `worker/CLAUDE.md`)
+- `npm run lint` (Biome).
 (All commands live as of Step 1. Backend rules: `worker/CLAUDE.md`.)
 
 ## Rules

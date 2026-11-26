@@ -38,6 +38,16 @@ Format: `YYYY-MM-DD · #keyword · decision — why`
 - 2026-11-26 · #task · `QuickAdd.dueDate` is a fallback only; a date in the text always wins.
 - 2026-11-26 · #type · `@motion/core` subpath exports (`/dates`, `/recurrence`, `/quickadd`, `/schemas`) so the web app imports helpers without zod.
 - 2026-11-26 · #ui · Visual layer "Atelier" on top of the HIG base: warm paper surfaces + static grain, clay accent (`--tint` #BD5430/#E8845F; small text uses `--tint-ink`), Instrument Serif for large/section titles, list "inks", card shadows over hairlines. Mono numerals for times/counts (from "Almanac"); time-of-day header tint deferred. Spec: `plans/2026-11-26-atelier.md`.
+- 2026-11-26 · #deploy · Prod resources: D1 `motion` `<D1_ID>`, KV `OAUTH_KV` `<KV_ID>`, origin `<ORIGIN>`.
+- 2026-11-26 · #deploy · `compatibility_flags: ["global_fetch_strictly_public"]` — CIMD makes the OAuth provider fetch client-supplied URLs; flag = public internet only (SSRF guard). No other outbound fetch.
+- 2026-11-26 · #deploy · `preview_urls: false` — version previews would be a second origin/issuer on the same D1 + KV.
+- 2026-11-26 · #auth · One KV namespace for OAuth keys + `sess:*` (prefix-separated) — single user; a second namespace adds config, no isolation.
+- 2026-11-26 · #auth · Prod `OAUTH_REDIRECT_ALLOW` = claude.ai + claude.com only; Inspector `localhost:6274` via `.dev.vars` / vitest bindings.
+- 2026-11-26 · #auth · Login limit: 5 fails/15 min/IP + 30/15 min global (`rl:*`); https without `cf-connecting-ip` → 400 (fail closed). Accepted: global ceiling can lock owner login 15 min; sessions/tokens unaffected.
+- 2026-11-26 · #deploy · Security headers: worker wrapper (`lib/headers.ts`, https only) + static `_headers` (HSTS, nosniff, DENY, CSP with sha256 of the inline SW registration). Referrer-Policy `strict-origin-when-cross-origin` — login `next` reads same-origin Referer.
+- 2026-11-26 · #pwa · SW `clientsClaim: true` (+~40 B SW) — first visit is controlled, so `/api` is cached before any reload.
+- 2026-11-26 · #pwa · Logout clears the SW `api` cache client-side (+84 B lazy, route-Lists) — `Clear-Site-Data: "cache"` doesn't reliably clear Cache Storage; `"storage"` wipes localStorage + unregisters the SW.
+- 2026-11-26 · #deploy · Root `deploy` = check + full test + worker deploy. Migrations additive-only (destructive = two deploys); `db:export` before every remote migrate.
 
 ## Dependencies (name · gz size · why)
 
