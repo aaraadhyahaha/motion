@@ -30,7 +30,7 @@ ok(
   ['authorization_endpoint', 'token_endpoint', 'registration_endpoint'].every((k) => abs(as[k])),
 );
 ok('AS metadata: S256', as.code_challenge_methods_supported?.includes('S256'));
-const pr = await (await go('/.well-known/oauth-protected-resource')).json();
+const pr = await (await go('/.well-known/oauth-protected-resource/mcp')).json(); // RFC 9728 path-suffixed
 ok('PR metadata: resource = /mcp', pr.resource === `${O}/mcp`, pr.resource);
 ok(
   'PR metadata: authorization_servers',
