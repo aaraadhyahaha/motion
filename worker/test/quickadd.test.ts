@@ -43,4 +43,16 @@ describe('quickAdd', () => {
     expect((await quickAdd(testCtx('UTC', now), { text: 'call today' })).dueDate).toBe('2026-11-26');
     expect((await quickAdd(testCtx('Asia/Kolkata', now), { text: 'call today' })).dueDate).toBe('2026-11-27');
   });
+
+  it('default dueDate applies only when the text has no date', async () => {
+    const ctx = testCtx();
+    expect((await quickAdd(ctx, { text: 'call mom friday', dueDate: '2026-11-26' })).dueDate).toBe(
+      '2026-11-27',
+    );
+    expect(await quickAdd(ctx, { text: 'call mom', dueDate: '2026-11-26' })).toMatchObject({
+      title: 'call mom',
+      dueDate: '2026-11-26',
+    });
+    expect(await quickAdd(ctx, { text: 'call mom' })).not.toHaveProperty('dueDate');
+  });
 });

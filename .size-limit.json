@@ -1,4 +1,0 @@
-[
-  { "name": "initial JS", "path": "apps/web/dist/assets/*.js", "limit": "90 KB", "gzip": true },
-  { "name": "initial CSS", "path": "apps/web/dist/assets/*.css", "limit": "15 KB", "gzip": true }
-]

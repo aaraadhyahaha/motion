@@ -7,11 +7,11 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 
 | Feature | Files | Tests | Status |
 |---|---|---|---|
-| Project rules | `CLAUDE.md`, `worker/CLAUDE.md` | — | ✅ |
+| Project rules | `CLAUDE.md`, `worker/CLAUDE.md`, `apps/web/CLAUDE.md` (HIG + motion + budgets + chunk prefixes) | — | ✅ |
 | Plans | `plans/*.md` | — | ✅ |
 | Decision log | `docs/DECISIONS.md` | — | ✅ |
 | Claude settings | `.claude/settings.json` | — | ✅ |
-| Workspaces + tooling | `package.json`, `tsconfig.base.json`, `biome.json`, `vitest.config.ts`, `.size-limit.json`, `*/package.json` | — | ✅ |
+| Workspaces + tooling | `package.json`, `tsconfig.base.json`, `biome.json`, `vitest.config.ts` (projects: core, worker, web), `apps/web/vitest.config.ts`, `.size-limit.js` (manifest-based budgets: initial/lazy/celebrate/SW/webmanifest), `*/package.json` | — | ✅ |
 
 ## #db — data
 
@@ -52,11 +52,32 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 
 | Feature | Files | Tests | Status |
 |---|---|---|---|
-| Design tokens | `apps/web/src/styles/tokens.css` (stub) | — | ⬜ |
-| Web scaffold (placeholder) | `apps/web/{index.html,vite.config.ts}`, `apps/web/src/{main,App}.tsx` | — | ✅ |
-| App shell | `apps/web/src/components/Shell*.tsx` | `apps/web/e2e/` | ⬜ |
+| Design tokens (type scale, semantic colors, materials, spacing/radii, springs, reduced-motion/-transparency) | `apps/web/src/styles/tokens.css` | — | ✅ |
+| Base styles + Inter @font-face (preloaded via `preloadInter` in vite.config) | `apps/web/src/styles/base.css`, `apps/web/src/main.tsx` | — | ✅ |
+| Icons (inline SVG paths) | `apps/web/src/components/Icon.tsx` | — | ✅ |
+| Web scaffold (main: QueryClientProvider + startSync + ensureTz) | `apps/web/{index.html,package.json}`, `apps/web/src/{main,App}.tsx` | — | ✅ |
+| Router (History API, `?t=` param) + spring mirror | `apps/web/src/lib/{router,springs}.ts` | `apps/web/src/lib/router.test.ts` | ✅ |
+| Web data layer (fetch/ApiError, QueryClient, keys, queries, optimistic mutations, first-run tz) | `apps/web/src/data/{api,client,keys,queries,mutations,tz}.ts` | — | ✅ |
+| Cache helpers (pure patchTask/removeTask) | `apps/web/src/data/cache.ts` | `apps/web/src/data/cache.test.ts` | ✅ |
+| Changes poller (visibility-gated, backoff, echo dedupe) | `apps/web/src/data/sync.ts` | `apps/web/src/data/sync.test.ts` | ✅ |
+| Toast store (undo) | `apps/web/src/ui/store.ts` | — | ✅ |
+| Build + chunk naming (entry-/route-/editor-/celebrate-/vendor-motion- via `codeSplitting` group, deps not recursive) | `apps/web/vite.config.ts`, `.size-limit.js` | — | ✅ |
+| App shell (layout, sidebar, tab bar, large→inline title, toast, empty) | `apps/web/src/components/{Shell,Sidebar,TabBar,PageHeader,Toast,Empty}.tsx`, `apps/web/src/styles/shell.css` | `apps/web/e2e/smoke.spec.ts` | ✅ |
+| Task rows (memo list, linger → leave, WAAPI FLIP, checkbox spring/wipe/haptic; `sticky` day headers, `keepDone` for Logbook) | `apps/web/src/components/{TaskList,TaskRow,Checkbox}.tsx`, `apps/web/src/lib/flip.ts`, `apps/web/src/styles/row.css` | `apps/web/e2e/smoke.spec.ts` | ✅ |
+| Quick add (core tokenize chips, ⌘K / N, dueDate=today on Today) | `apps/web/src/components/QuickAdd.tsx` | `apps/web/e2e/smoke.spec.ts` | ✅ |
+| Row/date formatting (Intl) | `apps/web/src/lib/format.ts` | — | ✅ |
+| Route switch + lazy routes + editor slot (`?t=`) + idle prefetch | `apps/web/src/App.tsx`, `apps/web/src/lib/prefetch.ts` | — | ✅ |
+| Today view (overdue + today, entry chunk) | `apps/web/src/routes/Today.tsx` | `apps/web/e2e/smoke.spec.ts` | ✅ |
+| Upcoming (13 days after today, sticky day headers, empty days collapse) | `apps/web/src/routes/Upcoming.tsx` | `apps/web/e2e/smoke.spec.ts`, shots | ✅ |
+| List/tag view (open tasks, infinite pages) + sentinel hook | `apps/web/src/routes/TaskQueryView.tsx`, `apps/web/src/lib/useSentinel.ts` | — | ✅ |
+| Lists tab (inset groups: lists, tags, Logbook) | `apps/web/src/routes/Lists.tsx`, `apps/web/src/styles/shell.css` (`.inset-*`) | — | ✅ |
+| Logbook (done, grouped by completion day, uncheck = uncomplete) | `apps/web/src/routes/Logbook.tsx` | — | ✅ |
+| Stats (tiles, 26-week heatmap, per-list bars; CSS lazy) | `apps/web/src/routes/{Stats,Heatmap}.tsx`, `apps/web/src/styles/stats.css` | shots | ✅ |
+| Editor sheet (`?t=<id>`, LazyMotion, seeded from cached rows, save-on-close diff PATCH, delete) | `apps/web/src/editor/EditorSheet.tsx`, `apps/web/src/data/queries.ts` (`useTask` seed) | `apps/web/e2e/smoke.spec.ts` | ✅ |
+| Sheet (bottom/centered, springs, drag-dismiss, focus trap, Esc, scrim) + pickers (dates, repeat, tags) | `apps/web/src/editor/{Sheet,DateFields,RepeatPicker,TagInput}.tsx`, `apps/web/src/styles/sheet.css`, `apps/web/src/styles/tokens.css` (`--scrim`, `--sheet-*`, `--grabber-*`) | `apps/web/e2e/smoke.spec.ts`, shots | ✅ |
 | Completion celebration | `apps/web/src/celebrate/*` | — | ⬜ |
-| PWA manifest + SW | `apps/web/vite.config.ts` | — | ⬜ |
+| PWA manifest + SW (precache shell · CacheFirst `/assets` · NetworkFirst `/api` GET) | `apps/web/vite.config.ts`, `apps/web/index.html` (metas), `apps/web/public/icons/*` | — | ✅ |
+| E2E smoke + screenshots (isolated D1 `worker/.wrangler/e2e`, wrangler :8787 + vite :5173, phone/desktop, SW blocked; shots → `e2e/shots/` gitignored) | `apps/web/playwright.config.ts`, `apps/web/e2e/{seed,smoke.spec,shots.spec}.ts`, `apps/web/e2e/tsconfig.json` | `npm run test:e2e -w @motion/web` | ✅ |
 
 ## #sched / #recur
 

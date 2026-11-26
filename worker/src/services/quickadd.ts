@@ -24,7 +24,9 @@ export async function quickAdd(ctx: Ctx, input: QuickAdd): Promise<Task> {
   return createTask(ctx, {
     title,
     ...(listId && { listId }),
-    ...(date && { dueDate: date.dueDate, dueTime: date.dueTime ?? null }),
+    ...(date
+      ? { dueDate: date.dueDate, dueTime: date.dueTime ?? null }
+      : input.dueDate && { dueDate: input.dueDate }),
     ...(tk.rrule && { rrule: tk.rrule, recurFrom: tk.recurFrom }),
     tags: tk.tags,
   });

@@ -8,6 +8,9 @@
       "!**/.wrangler",
       "!worker/migrations/meta",
       "!.claude",
+      "!.impeccable",
+      "!**/test-results",
+      "!**/playwright-report",
       "!**/*.md"
     ]
   },

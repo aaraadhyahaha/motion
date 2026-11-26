@@ -1,5 +1,275 @@
-/* Design tokens — filled in Phase 2 (HIG type scale, semantic colors, springs). */
+/* #ui #type #anim — design tokens (Apple HIG). Components use only these vars. */
 :root {
   color-scheme: light dark;
-  font-family: system-ui, -apple-system, "Inter", sans-serif;
+
+  /* ── Font ── */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Variable", system-ui, sans-serif;
+  --font-display:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter Variable", system-ui, sans-serif;
+
+  /* ── HIG type scale (iOS default size): size / line-height / weight / tracking ── */
+  --t-large-title-size: 34px;
+  --t-large-title-lh: 41px;
+  --t-large-title-wt: 700;
+  --t-large-title-ls: 0.4px;
+  --t-title1-size: 28px;
+  --t-title1-lh: 34px;
+  --t-title1-wt: 700;
+  --t-title1-ls: 0.38px;
+  --t-title2-size: 22px;
+  --t-title2-lh: 28px;
+  --t-title2-wt: 700;
+  --t-title2-ls: -0.26px;
+  --t-title3-size: 20px;
+  --t-title3-lh: 25px;
+  --t-title3-wt: 600;
+  --t-title3-ls: -0.45px;
+  --t-headline-size: 17px;
+  --t-headline-lh: 22px;
+  --t-headline-wt: 600;
+  --t-headline-ls: -0.43px;
+  --t-body-size: 17px;
+  --t-body-lh: 22px;
+  --t-body-wt: 400;
+  --t-body-ls: -0.43px;
+  --t-callout-size: 16px;
+  --t-callout-lh: 21px;
+  --t-callout-wt: 400;
+  --t-callout-ls: -0.31px;
+  --t-subhead-size: 15px;
+  --t-subhead-lh: 20px;
+  --t-subhead-wt: 400;
+  --t-subhead-ls: -0.23px;
+  --t-footnote-size: 13px;
+  --t-footnote-lh: 18px;
+  --t-footnote-wt: 400;
+  --t-footnote-ls: -0.08px;
+  --t-caption1-size: 12px;
+  --t-caption1-lh: 16px;
+  --t-caption1-wt: 400;
+  --t-caption1-ls: 0px;
+  --t-caption2-size: 11px;
+  --t-caption2-lh: 13px;
+  --t-caption2-wt: 400;
+  --t-caption2-ls: 0.06px;
+
+  /* ── Semantic colors (light, dark) ── */
+  --label: light-dark(#000, #fff);
+  --label2: light-dark(rgb(60 60 67 / 0.6), rgb(235 235 245 / 0.6));
+  --label3: light-dark(rgb(60 60 67 / 0.3), rgb(235 235 245 / 0.3));
+  --label4: light-dark(rgb(60 60 67 / 0.18), rgb(235 235 245 / 0.16));
+
+  --fill: light-dark(rgb(120 120 128 / 0.2), rgb(120 120 128 / 0.36));
+  --fill2: light-dark(rgb(120 120 128 / 0.16), rgb(120 120 128 / 0.32));
+  --fill3: light-dark(rgb(118 118 128 / 0.12), rgb(118 118 128 / 0.24));
+  --fill4: light-dark(rgb(116 116 128 / 0.08), rgb(118 118 128 / 0.18));
+
+  --bg: light-dark(#fff, #000);
+  --bg2: light-dark(#f2f2f7, #1c1c1e);
+  --bg3: light-dark(#fff, #2c2c2e);
+  --bg-grouped: light-dark(#f2f2f7, #000);
+  --bg-grouped2: light-dark(#fff, #1c1c1e);
+  --bg-grouped3: light-dark(#f2f2f7, #2c2c2e);
+
+  --separator: light-dark(rgb(60 60 67 / 0.29), rgb(84 84 88 / 0.6));
+  --separator-opaque: light-dark(#c6c6c8, #38383a);
+
+  --tint: light-dark(#ff9500, #ff9f0a); /* systemOrange */
+  --on-tint: #fff;
+  --red: light-dark(#ff3b30, #ff453a);
+  --green: light-dark(#34c759, #30d158);
+
+  /* list palette (stored hex in DB is the light value; UI maps to these) */
+  --list-red: light-dark(#ff3b30, #ff453a);
+  --list-yellow: light-dark(#ffcc00, #ffd60a);
+  --list-green: light-dark(#34c759, #30d158);
+  --list-cyan: light-dark(#32ade6, #64d2ff);
+  --list-blue: light-dark(#007aff, #0a84ff);
+  --list-purple: light-dark(#af52de, #bf5af2);
+
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--tint) 50%, transparent);
+
+  /* ── Materials (fixed chrome only) ── */
+  --material-bar-bg: light-dark(rgb(249 249 249 / 0.8), rgb(29 29 29 / 0.8));
+  --material-sheet-bg: light-dark(rgb(255 255 255 / 0.85), rgb(30 30 30 / 0.85));
+  --material-blur: saturate(180%) blur(20px);
+  --scrim: light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.48));
+
+  /* ── Spacing (4-pt), radii, targets, safe areas ── */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --r-button: 8px;
+  --r-group: 10px;
+  --r-sheet: 14px;
+  --r-pill: 999px;
+  --tap: 44px;
+  --hairline: 0.5px;
+  /* layout */
+  --sidebar-w: 260px;
+  --content-max: 720px;
+  --sheet-w: 560px;
+  --sheet-max-h: 92dvh;
+  --grabber-w: 36px;
+  --grabber-h: 5px;
+  --tabbar-h: 49px;
+  --check-size: 22px;
+  --check-stroke: 1.5px;
+  --dot-size: 8px;
+  --heat-gap: 3px;
+  --r-heat: 2px;
+  --bar-h: 6px;
+  --press-scale: 0.97;
+  --leave-scale: 0.96;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* ── Springs: damped-spring samples as linear(); mirror in src/lib/springs.ts ── */
+  /* critically damped (ζ≈1) — snappy k700/c53, smooth k260/c32 share this curve */
+  --ease-spring: linear(
+    0,
+    0.078,
+    0.235,
+    0.402,
+    0.549,
+    0.67,
+    0.762,
+    0.832,
+    0.882,
+    0.918,
+    0.944,
+    0.962,
+    0.974,
+    0.982,
+    0.988,
+    0.992,
+    0.995,
+    0.996,
+    0.998,
+    0.998,
+    1
+  );
+  /* underdamped (ζ≈0.69, k300/c24) — ~5% overshoot */
+  --ease-bouncy: linear(
+    0,
+    0.104,
+    0.322,
+    0.555,
+    0.751,
+    0.894,
+    0.983,
+    1.03,
+    1.047,
+    1.047,
+    1.038,
+    1.027,
+    1.016,
+    1.008,
+    1.002,
+    0.999,
+    0.998,
+    0.998,
+    0.998,
+    0.998,
+    1
+  );
+  --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --dur-snappy: 350ms;
+  --dur-smooth: 550ms;
+  --dur-bouncy: 600ms;
+  --dur-fade: 150ms;
+
+  --spring-snappy: var(--dur-snappy) var(--ease-spring);
+  --spring-smooth: var(--dur-smooth) var(--ease-spring);
+  --spring-bouncy: var(--dur-bouncy) var(--ease-bouncy);
+  --fade: var(--dur-fade) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-snappy: 0ms;
+    --dur-smooth: 0ms;
+    --dur-bouncy: 0ms;
+    /* --dur-fade kept: opacity fades stay */
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --material-bar-bg: var(--bg2);
+    --material-sheet-bg: var(--bg3);
+    --material-blur: none;
+  }
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  :root {
+    --material-bar-bg: var(--bg2);
+    --material-sheet-bg: var(--bg3);
+  }
+}
+
+/* ── Type classes ── */
+.t-large-title,
+.t-title1,
+.t-title2,
+.t-title3,
+.t-headline {
+  text-wrap: balance;
+}
+.t-large-title {
+  font: var(--t-large-title-wt) var(--t-large-title-size) / var(--t-large-title-lh) var(--font-display);
+  letter-spacing: var(--t-large-title-ls);
+}
+.t-title1 {
+  font: var(--t-title1-wt) var(--t-title1-size) / var(--t-title1-lh) var(--font-display);
+  letter-spacing: var(--t-title1-ls);
+}
+.t-title2 {
+  font: var(--t-title2-wt) var(--t-title2-size) / var(--t-title2-lh) var(--font-display);
+  letter-spacing: var(--t-title2-ls);
+}
+.t-title3 {
+  font: var(--t-title3-wt) var(--t-title3-size) / var(--t-title3-lh) var(--font-display);
+  letter-spacing: var(--t-title3-ls);
+}
+.t-headline {
+  font: var(--t-headline-wt) var(--t-headline-size) / var(--t-headline-lh) var(--font);
+  letter-spacing: var(--t-headline-ls);
+}
+.t-body {
+  font: var(--t-body-wt) var(--t-body-size) / var(--t-body-lh) var(--font);
+  letter-spacing: var(--t-body-ls);
+  text-wrap: pretty;
+}
+.t-callout {
+  font: var(--t-callout-wt) var(--t-callout-size) / var(--t-callout-lh) var(--font);
+  letter-spacing: var(--t-callout-ls);
+}
+.t-subhead {
+  font: var(--t-subhead-wt) var(--t-subhead-size) / var(--t-subhead-lh) var(--font);
+  letter-spacing: var(--t-subhead-ls);
+}
+.t-footnote {
+  font: var(--t-footnote-wt) var(--t-footnote-size) / var(--t-footnote-lh) var(--font);
+  letter-spacing: var(--t-footnote-ls);
+}
+.t-caption1 {
+  font: var(--t-caption1-wt) var(--t-caption1-size) / var(--t-caption1-lh) var(--font);
+  letter-spacing: var(--t-caption1-ls);
+}
+.t-caption2 {
+  font: var(--t-caption2-wt) var(--t-caption2-size) / var(--t-caption2-lh) var(--font);
+  letter-spacing: var(--t-caption2-ls);
+}
+.tnum {
+  font-variant-numeric: tabular-nums;
 }

@@ -1,0 +1,260 @@
+/* #ui editor sheet + pickers. Imported from the lazy editor chunk only. */
+
+.sheet-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--scrim);
+}
+.sheet-pos {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 41;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.sheet {
+  pointer-events: auto;
+  width: 100%;
+  max-height: var(--sheet-max-h);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  padding-bottom: var(--safe-bottom);
+  background: var(--material-sheet-bg);
+  -webkit-backdrop-filter: var(--material-blur);
+  backdrop-filter: var(--material-blur);
+  border: var(--hairline) solid var(--separator);
+  border-bottom: 0;
+}
+/* focus lands on the dialog itself (trap anchor, tabIndex -1) — not an interactive control, no ring */
+.sheet:focus-visible {
+  box-shadow: none;
+}
+@media (min-width: 768px) {
+  .sheet-pos {
+    inset: 0;
+    align-items: center;
+    padding: var(--s-8);
+  }
+  .sheet {
+    max-width: var(--sheet-w);
+    border-radius: var(--r-sheet);
+    border-bottom: var(--hairline) solid var(--separator);
+    padding-bottom: var(--s-4);
+  }
+  .sheet-grab {
+    cursor: auto;
+  }
+  .sheet-grabber {
+    display: none;
+  }
+}
+
+/* drag zone = grabber + header bar (≥ 44px tall); buttons inside stay tappable */
+.sheet-grab {
+  padding-top: var(--s-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  touch-action: none;
+  cursor: grab;
+  flex: none;
+}
+.sheet-grabber {
+  width: var(--grabber-w);
+  height: var(--grabber-h);
+  border-radius: var(--r-pill);
+  background: var(--fill);
+}
+.sheet-bar {
+  align-self: stretch;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-inline: var(--s-2);
+}
+.sheet-del {
+  color: var(--red);
+}
+.sheet-body {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: var(--s-4);
+}
+
+/* ── Fields ── */
+.ed-pad {
+  padding: var(--s-4);
+}
+.ed-title,
+.ed-notes {
+  display: block;
+  width: 100%;
+  padding: var(--s-2) var(--s-4);
+  background: none;
+  border: 0;
+  outline: 0;
+  color: var(--label);
+}
+.ed-title {
+  min-height: var(--tap);
+}
+.ed-notes {
+  resize: none;
+  field-sizing: content;
+  min-height: var(--tap);
+  color: var(--label2);
+}
+.ed-notes::placeholder,
+.ed-tag-input::placeholder {
+  color: var(--label3);
+}
+.ed-group {
+  margin-top: var(--s-4);
+}
+.ed-row {
+  min-height: var(--tap);
+}
+.ed-icon {
+  width: var(--s-6);
+  display: flex;
+  justify-content: center;
+  color: var(--label2);
+  flex: none;
+}
+.ed-label {
+  flex: 1;
+  color: var(--label);
+}
+.ed-native {
+  min-height: var(--tap);
+  max-width: 60%;
+  background: none;
+  border: 0;
+  outline: 0;
+  text-align: end;
+  color: var(--label2);
+  accent-color: var(--tint);
+}
+.ed-native:disabled {
+  opacity: 0.4;
+}
+.ed-native:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+.ed-num {
+  width: calc(var(--tap) * 1.5);
+}
+.ed-hint {
+  padding: var(--s-2) var(--s-8) 0;
+  color: var(--label2);
+}
+
+/* chips (quick dates, tag suggestions) */
+/* one row; scrolls sideways if it ever overflows (never wraps a lone chip) */
+.ed-chips {
+  display: flex;
+  gap: var(--s-2);
+  padding: 0 var(--s-4) var(--s-3);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.ed-chips > * {
+  flex: none;
+}
+.ed-chip,
+.ed-day {
+  min-height: var(--tap);
+  padding-inline: var(--s-3);
+  border-radius: var(--r-pill);
+  background: var(--fill3);
+  color: var(--label);
+  transition:
+    transform var(--spring-snappy),
+    opacity var(--fade);
+}
+.ed-chip:active,
+.ed-day:active {
+  transform: scale(var(--press-scale));
+}
+.ed-chip[aria-pressed="true"],
+.ed-day[aria-pressed="true"] {
+  background: var(--tint);
+  color: var(--on-tint);
+}
+
+/* weekday toggles: 7 round 44px targets */
+.ed-days {
+  justify-content: space-between;
+  gap: var(--s-1);
+}
+.ed-day {
+  width: var(--tap);
+  padding: 0;
+}
+
+/* iOS-style switch on a native checkbox (transform/opacity only for the knob) */
+.ed-switch {
+  appearance: none;
+  position: relative;
+  width: calc(var(--tap) * 1.16);
+  height: calc(var(--tap) * 0.7);
+  border-radius: var(--r-pill);
+  background: var(--fill);
+  flex: none;
+  cursor: pointer;
+}
+.ed-switch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--green);
+  opacity: 0;
+  transition: opacity var(--fade);
+}
+.ed-switch::after {
+  content: "";
+  position: absolute;
+  top: var(--s-1);
+  left: var(--s-1);
+  width: calc(var(--tap) * 0.7 - var(--s-2));
+  aspect-ratio: 1;
+  border-radius: var(--r-pill);
+  background: var(--bg3);
+  transition: transform var(--spring-snappy);
+}
+.ed-switch:checked::before {
+  opacity: 1;
+}
+.ed-switch:checked::after {
+  transform: translateX(calc(var(--tap) * 0.46));
+}
+
+/* tag tokens */
+.ed-tags {
+  flex-wrap: wrap;
+  gap: var(--s-1);
+  padding-block: var(--s-1);
+}
+.ed-token {
+  min-height: var(--tap);
+  padding-inline: var(--s-3) var(--s-2);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  border-radius: var(--r-pill);
+  background: var(--fill3);
+  color: var(--tint);
+}
+.ed-tag-input {
+  flex: 1;
+  min-width: calc(var(--tap) * 2);
+  min-height: var(--tap);
+  background: none;
+  border: 0;
+  outline: 0;
+  color: var(--label);
+}

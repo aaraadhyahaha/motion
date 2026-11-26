@@ -1,0 +1,154 @@
+/* #ui #type — reset, font, base elements. Values from tokens.css only. */
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100dvh;
+  font: var(--t-body-wt) var(--t-body-size) / var(--t-body-lh) var(--font);
+  letter-spacing: var(--t-body-ls);
+  color: var(--label);
+  background: var(--bg-grouped);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis-weight: none;
+  overscroll-behavior-y: none;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+svg {
+  flex-shrink: 0;
+}
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+button {
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+a {
+  color: var(--tint);
+  text-decoration: none;
+}
+ul,
+ol {
+  list-style: none;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+
+:focus {
+  outline: none;
+}
+:focus-visible {
+  box-shadow: var(--focus-ring);
+  border-radius: var(--r-button);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--tint) 30%, transparent);
+}
+
+/* ── Inset grouped list ── */
+.inset-group {
+  margin-inline: var(--s-4);
+  border-radius: var(--r-group);
+  background: var(--bg-grouped2);
+  overflow: clip;
+}
+.inset-group > * {
+  min-height: var(--tap);
+  padding-inline: var(--s-4);
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  position: relative;
+}
+/* HIG inset separator: starts at content leading edge */
+.inset-group > * + *::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto var(--s-4);
+  border-top: var(--hairline) solid var(--separator);
+}
+
+/* ── Buttons ── */
+.btn {
+  min-height: var(--tap);
+  min-width: var(--tap);
+  padding-inline: var(--s-4);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  border-radius: var(--r-button);
+  font-weight: var(--t-headline-wt);
+  transition:
+    opacity var(--fade),
+    transform var(--spring-snappy);
+}
+.btn:active {
+  opacity: 0.6;
+  transform: scale(0.97);
+}
+.btn-tint {
+  background: var(--tint);
+  color: var(--on-tint);
+}
+.btn-plain {
+  color: var(--tint);
+}
+.btn-icon {
+  padding: 0;
+  border-radius: var(--r-pill);
+  color: var(--tint);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

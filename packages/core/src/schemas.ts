@@ -55,7 +55,12 @@ export const TaskQuery = z.object({
   limit: z._default(qInt(1, 100), 50),
 });
 
-export const QuickAdd = z.object({ text: str(1, 500), listId: opt(Id) });
+export const QuickAdd = z.object({
+  text: str(1, 500),
+  listId: opt(Id),
+  /** Used only when the text has no date (e.g. adding from Today). */
+  dueDate: opt(DayKey),
+});
 export const AgendaQuery = z.object({ days: z._default(qInt(1, 60), 7) });
 export const StatsQuery = z.object({ days: z._default(qInt(1, 366), 30) });
 export const ChangesQuery = z.object({ since: qInt(0, Number.MAX_SAFE_INTEGER) });
@@ -116,6 +121,8 @@ export interface Agenda {
 }
 export interface Stats {
   perDay: Record<string, number>;
+  /** Completions per listId in the same window; lists with none are omitted. */
+  perList: Record<string, number>;
   streak: number;
   best: number;
   total: number;

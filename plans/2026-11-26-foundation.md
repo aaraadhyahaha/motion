@@ -186,7 +186,8 @@ motion/
    - Ask the questions in section 8, then record the answers in `docs/DECISIONS.md` and `FEATURE_MAP.md`.
    - Scaffold the npm workspaces, then build the schemas in `packages/core`, the D1 schema and migrations, the services and the REST routes.
    - Add unit and worker tests.
-2. **Interface:** tokens, typography and the app shell (sidebar and tab bar), then the task list, editor sheet and the views you choose. Dark mode, PWA manifest and offline cache.
+2. **Interface ✅ done (2026-11-26):** detail in `plans/2026-11-26-phase2-interface.md`. HIG tokens, shell, Today + lazy views, motion sheet editor, PWA; check + 76 unit + 18 e2e green. Budgets (gz): initial JS 89.69/90 KB · CSS 4.3/15 KB · lazy 41.56/45 KB · SW 8.73/10 KB · manifest 201 B/1 KB.
+   - Tokens, typography and the app shell (sidebar and tab bar), then the task list, editor sheet and the views you choose. Dark mode, PWA manifest and offline cache.
 3. **MCP and auth:** OAuth provider, owner login, MCP tools wired to the services. Test locally with MCP Inspector.
 4. **Celebrations and polish:** completion animations, empty states, keyboard shortcuts, accessibility pass (VoiceOver labels, focus rings, contrast).
 5. **Deploy:** `wrangler d1 create`, set secrets, `wrangler deploy`, then connect to claude.ai.
