@@ -7,7 +7,13 @@
         "rule": "overused-font",
         "value": "inter",
         "createdAt": "2026-11-26T11:46:51.016Z",
-        "reason": "user-specified: root CLAUDE.md + step 3 request mandate system font → Inter fallback (Apple HIG)"
+        "reason": "user-specified: root CLAUDE.md + step 3 request mandate system font \u2192 Inter fallback (Apple HIG)"
+      },
+      {
+        "rule": "overused-font",
+        "value": "instrument serif",
+        "createdAt": "2026-11-26T19:00:00.000Z",
+        "reason": "user-approved Atelier direction: Instrument Serif for large/section titles (plans/2026-11-26-atelier.md)"
       }
     ]
   }

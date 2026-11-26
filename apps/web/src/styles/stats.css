@@ -12,13 +12,15 @@
   gap: var(--s-1);
   border-radius: var(--r-group);
   background: var(--bg-grouped2);
+  box-shadow: var(--shadow-card);
 }
-.tile-label,
 .tile-hint {
   color: var(--label2);
 }
 .tile-value {
-  color: var(--tint);
+  color: var(--tint-ink);
+  font: 400 40px / 1 var(--font-serif);
+  font-variant-numeric: tabular-nums;
 }
 
 .stats-card {
@@ -26,6 +28,7 @@
   padding: var(--s-4);
   border-radius: var(--r-group);
   background: var(--bg-grouped2);
+  box-shadow: var(--shadow-card);
 }
 
 .heatmap {
@@ -37,17 +40,17 @@
 }
 .heat {
   aspect-ratio: 1;
-  border-radius: var(--r-heat);
-  background: var(--fill3);
+  border-radius: 3px;
+  background: var(--fill4);
 }
 .heat[data-l="1"] {
-  background: color-mix(in srgb, var(--tint) 30%, var(--fill3));
+  background: color-mix(in srgb, var(--tint) 30%, var(--fill4));
 }
 .heat[data-l="2"] {
-  background: color-mix(in srgb, var(--tint) 55%, var(--fill3));
+  background: color-mix(in srgb, var(--tint) 55%, var(--fill4));
 }
 .heat[data-l="3"] {
-  background: color-mix(in srgb, var(--tint) 80%, var(--fill3));
+  background: color-mix(in srgb, var(--tint) 80%, var(--fill4));
 }
 .heat[data-l="4"] {
   background: var(--tint);
@@ -71,7 +74,7 @@
   grid-column: 1 / -1;
   height: var(--bar-h);
   border-radius: var(--r-pill);
-  background: var(--dot);
+  background: var(--ink, var(--dot));
   transform: scaleX(var(--k));
   transform-origin: left;
   animation: bar-in var(--spring-smooth);

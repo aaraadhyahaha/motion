@@ -70,7 +70,7 @@ export function QuickAdd({ listId, dueToday }: Props) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === 'Escape' && e.currentTarget.blur()}
-          placeholder="New task — try “call mom tomorrow 5pm @home”"
+          placeholder="Jot it down — “call mom tomorrow 5pm @home”"
           aria-label="New task"
           enterKeyHint="done"
           autoComplete="off"

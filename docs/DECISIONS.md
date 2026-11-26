@@ -32,11 +32,12 @@ Format: `YYYY-MM-DD · #keyword · decision — why`
 - 2026-11-26 · #ui · Nav: frosted sidebar (views + lists + tags) on wide screens; bottom tab bar (Today · Upcoming · Lists · Stats) + large titles on phones.
 - 2026-11-26 · #ui · Quick add: pinned bottom bar (above tab bar on phone), focused by ⌘K / N; live chips for #list/@tag/repeat.
 - 2026-11-26 · #ui · Task editor is a lazy-loaded sheet (bottom sheet on phone, centered sheet on desktop).
-- 2026-11-26 · #ui · Accent = systemOrange (#FF9500 light / #FF9F0A dark).
+- ~~2026-11-26 · #ui · Accent = systemOrange (#FF9500 light / #FF9F0A dark).~~ Superseded below.
 - 2026-11-26 · #ui · Stats: streak/today/week tiles + CSS-grid completion heatmap + per-list bars; no chart library.
 - 2026-11-26 · #sched · `Stats.perList`: `Record<listId, count>` over the same `days` window, zero lists omitted; counts by the task's current list (not list at completion time).
 - 2026-11-26 · #task · `QuickAdd.dueDate` is a fallback only; a date in the text always wins.
 - 2026-11-26 · #type · `@motion/core` subpath exports (`/dates`, `/recurrence`, `/quickadd`, `/schemas`) so the web app imports helpers without zod.
+- 2026-11-26 · #ui · Visual layer "Atelier" on top of the HIG base: warm paper surfaces + static grain, clay accent (`--tint` #BD5430/#E8845F; small text uses `--tint-ink`), Instrument Serif for large/section titles, list "inks", card shadows over hairlines. Mono numerals for times/counts (from "Almanac"); time-of-day header tint deferred. Spec: `plans/2026-11-26-atelier.md`.
 
 ## Dependencies (name · gz size · why)
 
@@ -51,4 +52,5 @@ Measured with esbuild minify + gzip, tree-shaken to what we import.
 - `vite-plugin-pwa` 2.0.0 · 0 KB app JS (inline registration) · manifest + generated SW (workbox, build time; SW budget 10 KB gz in `.size-limit.js`). Dev. npm audit: 8 moderate in its build-time workbox deps.
 - `@playwright/test` 1.65.1 · 0 KB · smoke test + screenshots on system Chrome (`channel: 'chrome'`, no browser download). Dev.
 - `@fontsource-variable/inter` 5.3.0 · 0 KB JS; one asset `inter-latin-wght-normal.woff2` 47.1 KB (already compressed) · Inter fallback font, latin subset. Dev.
+- `@fontsource/instrument-serif` 5.2.5 · 0 KB JS; one asset `instrument-serif-latin-400-normal.woff2` 21.0 KB, not preloaded (`swap`, Georgia fallback) · Atelier display serif for large/section titles. Dev.
 - Dev only (no runtime cost): `typescript`, `vitest`, `@cloudflare/vitest-plugin`, `wrangler`, `@cloudflare/workers-types`, `drizzle-kit`, `@biomejs/biome`, `vite`, `@vitejs/plugin-react`, `size-limit`, `@size-limit/file`, `@types/react*`. Phase 2 dev deps listed above.

@@ -52,8 +52,8 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 
 | Feature | Files | Tests | Status |
 |---|---|---|---|
-| Design tokens (type scale, semantic colors, materials, spacing/radii, springs, reduced-motion/-transparency) | `apps/web/src/styles/tokens.css` | — | ✅ |
-| Base styles + Inter @font-face (preloaded via `preloadInter` in vite.config) | `apps/web/src/styles/base.css`, `apps/web/src/main.tsx` | — | ✅ |
+| Design tokens (HIG base + Atelier layer: warm semantic colors, clay tint/tint-ink, list inks, serif/mono, card shadow, grain; springs, reduced-motion/-transparency) | `apps/web/src/styles/tokens.css`, spec `plans/2026-11-26-atelier.md` | shots | ✅ |
+| Base styles (grain, themed selection/caret/scrollbar) + Inter @font-face (preloaded via `preloadInter` in vite.config) + Instrument Serif @font-face (not preloaded) | `apps/web/src/styles/base.css`, `apps/web/src/main.tsx` | — | ✅ |
 | Icons (inline SVG paths) | `apps/web/src/components/Icon.tsx` | — | ✅ |
 | Web scaffold (main: QueryClientProvider + startSync + ensureTz) | `apps/web/{index.html,package.json}`, `apps/web/src/{main,App}.tsx` | — | ✅ |
 | Router (History API, `?t=` param) + spring mirror | `apps/web/src/lib/{router,springs}.ts` | `apps/web/src/lib/router.test.ts` | ✅ |
@@ -62,7 +62,7 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | Changes poller (visibility-gated, backoff, echo dedupe) | `apps/web/src/data/sync.ts` | `apps/web/src/data/sync.test.ts` | ✅ |
 | Toast store (undo) | `apps/web/src/ui/store.ts` | — | ✅ |
 | Build + chunk naming (entry-/route-/editor-/celebrate-/vendor-motion- via `codeSplitting` group, deps not recursive) | `apps/web/vite.config.ts`, `.size-limit.js` | — | ✅ |
-| App shell (layout, sidebar, tab bar, large→inline title, toast, empty) | `apps/web/src/components/{Shell,Sidebar,TabBar,PageHeader,Toast,Empty}.tsx`, `apps/web/src/styles/shell.css` | `apps/web/e2e/smoke.spec.ts` | ✅ |
+| App shell (layout, sidebar + serif wordmark, tab bar, large→inline title + note line/swash, toast, teacup empty) | `apps/web/src/components/{Shell,Sidebar,TabBar,PageHeader,Toast,Empty}.tsx`, `apps/web/src/styles/shell.css` | `apps/web/e2e/smoke.spec.ts` | ✅ |
 | Task rows (memo list, linger → leave, WAAPI FLIP, checkbox spring/wipe/haptic; `sticky` day headers, `keepDone` for Logbook) | `apps/web/src/components/{TaskList,TaskRow,Checkbox}.tsx`, `apps/web/src/lib/flip.ts`, `apps/web/src/styles/row.css` | `apps/web/e2e/smoke.spec.ts` | ✅ |
 | Quick add (core tokenize chips, ⌘K / N, dueDate=today on Today) | `apps/web/src/components/QuickAdd.tsx` | `apps/web/e2e/smoke.spec.ts` | ✅ |
 | Row/date formatting (Intl) | `apps/web/src/lib/format.ts` | — | ✅ |

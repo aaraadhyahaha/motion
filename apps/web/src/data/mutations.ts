@@ -46,7 +46,7 @@ export function useComplete() {
   return useMutation({
     mutationFn: (id: string) => api<Task>('POST', `/tasks/${id}/complete`),
     onMutate: (id) => {
-      toast('Completed', { label: 'Undo', run: () => undo.mutate(id) });
+      toast('Done. Nicely handled.', { label: 'Undo', run: () => undo.mutate(id) });
       return optimistic(qc, (d) => patchTask(d, id, { done: true, doneAt: Date.now() }));
     },
     onError: (_e, _id, snap) => rollback(qc, snap, 'Couldn’t complete task'),

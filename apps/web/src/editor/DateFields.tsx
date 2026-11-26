@@ -52,7 +52,7 @@ export function DateFields({ today, dueDate, dueTime, durationMin, onChange }: P
           <span className="ed-label">Time</span>
           <input
             type="time"
-            className="ed-native"
+            className="ed-native mono"
             value={dueTime ?? ''}
             disabled={!dueDate}
             onChange={(e) => set({ dueTime: e.target.value || undefined })}

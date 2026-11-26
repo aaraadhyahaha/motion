@@ -38,7 +38,7 @@ export function Sidebar({ route }: { route: Route }) {
                 className="side-item"
                 aria-current={cur(route.name === 'list' && route.id === l.id)}
               >
-                <span className="dot" style={{ '--dot': l.color ?? 'var(--list-blue)' } as CSSProperties} />
+                <span className="dot" style={{ '--dot': l.color ?? 'var(--list-purple)' } as CSSProperties} />
                 <span>{l.name}</span>
               </Link>
             </li>

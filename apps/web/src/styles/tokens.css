@@ -1,4 +1,5 @@
-/* #ui #type #anim — design tokens (Apple HIG). Components use only these vars. */
+/* #ui #type #anim — design tokens: Apple HIG base + Atelier layer (warm paper, serif display, clay ink).
+   Components use only these vars. Spec: plans/2026-11-26-atelier.md */
 :root {
   color-scheme: light dark;
 
@@ -6,24 +7,32 @@
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Variable", system-ui, sans-serif;
   --font-display:
     -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter Variable", system-ui, sans-serif;
+  /* Atelier: serif for large/section titles only; Georgia is a close swap fallback */
+  --font-serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
   /* ── HIG type scale (iOS default size): size / line-height / weight / tracking ── */
-  --t-large-title-size: 34px;
-  --t-large-title-lh: 41px;
-  --t-large-title-wt: 700;
-  --t-large-title-ls: 0.4px;
+  --t-large-title-size: 50px;
+  --t-large-title-lh: 52px;
+  --t-large-title-wt: 400;
+  --t-large-title-ls: -0.6px;
   --t-title1-size: 28px;
   --t-title1-lh: 34px;
   --t-title1-wt: 700;
   --t-title1-ls: 0.38px;
-  --t-title2-size: 22px;
-  --t-title2-lh: 28px;
-  --t-title2-wt: 700;
-  --t-title2-ls: -0.26px;
-  --t-title3-size: 20px;
-  --t-title3-lh: 25px;
-  --t-title3-wt: 600;
-  --t-title3-ls: -0.45px;
+  --t-title2-size: 25px;
+  --t-title2-lh: 30px;
+  --t-title2-wt: 400;
+  --t-title2-ls: -0.2px;
+  --t-title3-size: 22px;
+  --t-title3-lh: 27px;
+  --t-title3-wt: 400;
+  --t-title3-ls: -0.1px;
+  /* eyebrow above large titles */
+  --t-eyebrow-size: 11.5px;
+  --t-eyebrow-lh: 16px;
+  --t-eyebrow-wt: 600;
+  --t-eyebrow-ls: 0.14em;
   --t-headline-size: 17px;
   --t-headline-lh: 22px;
   --t-headline-wt: 600;
@@ -54,46 +63,55 @@
   --t-caption2-ls: 0.06px;
 
   /* ── Semantic colors (light, dark) ── */
-  --label: light-dark(#000, #fff);
-  --label2: light-dark(rgb(60 60 67 / 0.6), rgb(235 235 245 / 0.6));
-  --label3: light-dark(rgb(60 60 67 / 0.3), rgb(235 235 245 / 0.3));
-  --label4: light-dark(rgb(60 60 67 / 0.18), rgb(235 235 245 / 0.16));
+  --label: light-dark(#231d16, #f3ede3); /* warm ink / warm bone */
+  --label2: light-dark(rgb(76 62 48 / 0.72), rgb(243 236 226 / 0.64));
+  --label3: light-dark(rgb(76 62 48 / 0.42), rgb(243 236 226 / 0.36));
+  --label4: light-dark(rgb(76 62 48 / 0.16), rgb(243 236 226 / 0.14));
 
-  --fill: light-dark(rgb(120 120 128 / 0.2), rgb(120 120 128 / 0.36));
-  --fill2: light-dark(rgb(120 120 128 / 0.16), rgb(120 120 128 / 0.32));
-  --fill3: light-dark(rgb(118 118 128 / 0.12), rgb(118 118 128 / 0.24));
-  --fill4: light-dark(rgb(116 116 128 / 0.08), rgb(118 118 128 / 0.18));
+  --fill: light-dark(rgb(120 96 70 / 0.2), rgb(243 230 210 / 0.22));
+  --fill2: light-dark(rgb(120 96 70 / 0.15), rgb(243 230 210 / 0.15));
+  --fill3: light-dark(rgb(120 96 70 / 0.1), rgb(243 230 210 / 0.09));
+  --fill4: light-dark(rgb(120 96 70 / 0.06), rgb(243 230 210 / 0.06));
 
-  --bg: light-dark(#fff, #000);
-  --bg2: light-dark(#f2f2f7, #1c1c1e);
-  --bg3: light-dark(#fff, #2c2c2e);
-  --bg-grouped: light-dark(#f2f2f7, #000);
-  --bg-grouped2: light-dark(#fff, #1c1c1e);
-  --bg-grouped3: light-dark(#f2f2f7, #2c2c2e);
+  --bg: light-dark(#fffdf8, #1a1815);
+  --bg2: light-dark(#ece5d8, #211e1a);
+  --bg3: light-dark(#fffdf8, #2b2722);
+  --bg-grouped: light-dark(#f4efe6, #1a1815);
+  --bg-grouped2: light-dark(#fffdf8, #25221d);
+  --bg-grouped3: light-dark(#f4efe6, #2e2a24);
 
-  --separator: light-dark(rgb(60 60 67 / 0.29), rgb(84 84 88 / 0.6));
-  --separator-opaque: light-dark(#c6c6c8, #38383a);
+  --separator: light-dark(rgb(90 70 45 / 0.14), rgb(243 230 210 / 0.1));
+  --separator-opaque: light-dark(#e2d9c9, #3a352d);
 
-  --tint: light-dark(#ff9500, #ff9f0a); /* systemOrange */
-  --on-tint: #fff;
-  --red: light-dark(#ff3b30, #ff453a);
-  --green: light-dark(#34c759, #30d158);
+  --tint: light-dark(#bd5430, #e8845f); /* clay — fills, glyphs, ≥15px semibold */
+  --tint-ink: light-dark(#a3441f, #f09a77); /* small tinted text (AA 6.07 / 7.24) */
+  /* list ink: consumers paint var(--ink, var(--dot)); legacy stored Apple hexes remap below */
+  --on-tint: light-dark(#fffaf3, #22140c);
+  --red: light-dark(#b0341d, #f2836e); /* brick */
+  --green: light-dark(#5b7a3a, #9cbc72); /* moss */
 
-  /* list palette (stored hex in DB is the light value; UI maps to these) */
-  --list-red: light-dark(#ff3b30, #ff453a);
-  --list-yellow: light-dark(#ffcc00, #ffd60a);
-  --list-green: light-dark(#34c759, #30d158);
-  --list-cyan: light-dark(#32ade6, #64d2ff);
-  --list-blue: light-dark(#007aff, #0a84ff);
-  --list-purple: light-dark(#af52de, #bf5af2);
+  /* surfaces: warm card shadow instead of hairline boxes; static paper grain (never animated) */
+  --shadow-card:
+    0 0.5px 0 light-dark(rgb(90 60 30 / 0.1), rgb(0 0 0 / 0.4)),
+    0 10px 24px -14px light-dark(rgb(90 60 30 / 0.28), rgb(0 0 0 / 0.6));
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* list palette — Atelier "inks" (legacy names kept; clay→red, ochre→yellow, moss→green,
+     lagoon→cyan, indigo→blue (default), plum→purple) */
+  --list-red: light-dark(#bd5430, #e8845f);
+  --list-yellow: light-dark(#b9821a, #e2b04f);
+  --list-green: light-dark(#5b7a3a, #9cbc72);
+  --list-cyan: light-dark(#2c7a76, #6dc2bb);
+  --list-blue: light-dark(#4b58a6, #9aa6f0);
+  --list-purple: light-dark(#8c4777, #d48cbd);
 
   --focus-ring: 0 0 0 3px color-mix(in srgb, var(--tint) 50%, transparent);
 
   /* ── Materials (fixed chrome only) ── */
-  --material-bar-bg: light-dark(rgb(249 249 249 / 0.8), rgb(29 29 29 / 0.8));
-  --material-sheet-bg: light-dark(rgb(255 255 255 / 0.85), rgb(30 30 30 / 0.85));
+  --material-bar-bg: light-dark(rgb(247 242 233 / 0.84), rgb(30 27 23 / 0.84));
+  --material-sheet-bg: light-dark(rgb(255 252 246 / 0.92), rgb(36 33 28 / 0.92));
   --material-blur: saturate(180%) blur(20px);
-  --scrim: light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.48));
+  --scrim: light-dark(rgb(48 32 18 / 0.22), rgb(0 0 0 / 0.5));
 
   /* ── Spacing (4-pt), radii, targets, safe areas ── */
   --s-1: 4px;
@@ -104,9 +122,9 @@
   --s-6: 24px;
   --s-8: 32px;
   --s-10: 40px;
-  --r-button: 8px;
-  --r-group: 10px;
-  --r-sheet: 14px;
+  --r-button: 10px;
+  --r-group: 16px;
+  --r-sheet: 24px;
   --r-pill: 999px;
   --tap: 44px;
   --hairline: 0.5px;
@@ -193,6 +211,26 @@
   --fade: var(--dur-fade) var(--ease-out);
 }
 
+/* stored list colors are legacy Apple light hexes → Atelier inks (CSS-only, no JS map) */
+[style*="ff3b30" i] {
+  --ink: var(--list-red);
+}
+[style*="ffcc00" i] {
+  --ink: var(--list-yellow);
+}
+[style*="34c759" i] {
+  --ink: var(--list-green);
+}
+[style*="32ade6" i] {
+  --ink: var(--list-cyan);
+}
+[style*="007aff" i] {
+  --ink: var(--list-blue);
+}
+[style*="af52de" i] {
+  --ink: var(--list-purple);
+}
+
 @media (prefers-reduced-motion: reduce) {
   :root {
     --dur-snappy: 0ms;
@@ -226,7 +264,7 @@
   text-wrap: balance;
 }
 .t-large-title {
-  font: var(--t-large-title-wt) var(--t-large-title-size) / var(--t-large-title-lh) var(--font-display);
+  font: var(--t-large-title-wt) var(--t-large-title-size) / var(--t-large-title-lh) var(--font-serif);
   letter-spacing: var(--t-large-title-ls);
 }
 .t-title1 {
@@ -234,11 +272,11 @@
   letter-spacing: var(--t-title1-ls);
 }
 .t-title2 {
-  font: var(--t-title2-wt) var(--t-title2-size) / var(--t-title2-lh) var(--font-display);
+  font: var(--t-title2-wt) var(--t-title2-size) / var(--t-title2-lh) var(--font-serif);
   letter-spacing: var(--t-title2-ls);
 }
 .t-title3 {
-  font: var(--t-title3-wt) var(--t-title3-size) / var(--t-title3-lh) var(--font-display);
+  font: var(--t-title3-wt) var(--t-title3-size) / var(--t-title3-lh) var(--font-serif);
   letter-spacing: var(--t-title3-ls);
 }
 .t-headline {
@@ -272,4 +310,17 @@
 }
 .tnum {
   font-variant-numeric: tabular-nums;
+}
+/* Almanac borrow: times, durations, counts in mono */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.t-eyebrow {
+  font: var(--t-eyebrow-wt) var(--t-eyebrow-size) / var(--t-eyebrow-lh) var(--font);
+  letter-spacing: var(--t-eyebrow-ls);
+  text-transform: uppercase;
+  color: var(--tint-ink);
 }

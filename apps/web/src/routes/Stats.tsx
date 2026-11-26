@@ -11,9 +11,9 @@ import '../styles/stats.css';
 function Tile({ label, value, hint }: { label: string; value: number; hint?: string }) {
   return (
     <div className="tile">
-      <span className="tile-label t-footnote">{label}</span>
-      <span className="tile-value t-title1 tnum">{value}</span>
-      {hint && <span className="tile-hint t-caption1 tnum">{hint}</span>}
+      <span className="tile-label t-eyebrow">{label}</span>
+      <span className="tile-value">{value}</span>
+      {hint && <span className="tile-hint t-caption1 mono">{hint}</span>}
     </div>
   );
 }
@@ -44,22 +44,25 @@ export default function Stats() {
             <Tile label="This week" value={week} />
           </div>
           <section className="task-section">
-            <h2 className="task-section-title t-headline">Last 26 weeks</h2>
+            <h2 className="task-section-title t-title3">Last 26 weeks</h2>
             <div className="stats-card">
               <Heatmap perDay={s.perDay} today={today} />
             </div>
           </section>
           {per.length > 0 && (
             <section className="task-section">
-              <h2 className="task-section-title t-headline">By list</h2>
+              <h2 className="task-section-title t-title3">By list</h2>
               <ul className="stats-card bars">
                 {per.map(([id, n]) => {
                   const l = byId.get(id);
-                  const style = { '--k': n / top, '--dot': l?.color ?? 'var(--list-blue)' } as CSSProperties;
+                  const style = {
+                    '--k': n / top,
+                    '--dot': l?.color ?? 'var(--list-purple)',
+                  } as CSSProperties;
                   return (
                     <li key={id} className="bar-row" style={style}>
                       <span className="bar-label t-subhead">{l?.name ?? 'Inbox'}</span>
-                      <span className="t-subhead tnum">{n}</span>
+                      <span className="t-subhead mono">{n}</span>
                       <span className="bar" aria-hidden />
                     </li>
                   );

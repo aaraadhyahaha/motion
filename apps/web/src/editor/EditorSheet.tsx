@@ -169,7 +169,7 @@ export default function EditorSheet({ id, onClose }: { id: string; onClose: () =
                   <span className="ed-icon">
                     <span
                       className="dot"
-                      style={{ '--dot': list?.color ?? 'var(--list-blue)' } as CSSProperties}
+                      style={{ '--dot': list?.color ?? 'var(--list-purple)' } as CSSProperties}
                     />
                   </span>
                   <span className="ed-label">List</span>

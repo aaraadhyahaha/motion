@@ -80,7 +80,7 @@ export function RepeatPicker({ rrule, recurFrom, onChange }: Props) {
               inputMode="numeric"
               min={1}
               max={99}
-              className="ed-native ed-num tnum"
+              className="ed-native ed-num mono"
               value={rule.interval}
               onChange={(e) =>
                 setRule({ ...rule, interval: Math.min(99, Math.max(1, Number(e.target.value) || 1)) })
@@ -121,7 +121,7 @@ export function RepeatPicker({ rrule, recurFrom, onChange }: Props) {
             <span className="ed-icon" />
             <span className="ed-label">On day</span>
             <select
-              className="ed-native tnum"
+              className="ed-native mono"
               value={rule.byMonthDay?.[0] ?? ''}
               onChange={(e) =>
                 setRule({

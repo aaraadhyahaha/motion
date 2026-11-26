@@ -23,12 +23,12 @@ export const TaskRow = memo(function TaskRow({ task: t, list, showDate, leaving,
       </span>
     ),
     t.dueTime && (
-      <span key="t" className="tnum">
+      <span key="t" className="mono">
         {fmtTime(t.dueTime)}
       </span>
     ),
     t.durationMin && (
-      <span key="m" className="tnum">
+      <span key="m" className="mono">
         {fmtDuration(t.durationMin)}
       </span>
     ),
@@ -37,7 +37,7 @@ export const TaskRow = memo(function TaskRow({ task: t, list, showDate, leaving,
       <span
         key="l"
         className="row-list"
-        style={{ '--dot': list.color ?? 'var(--list-blue)' } as CSSProperties}
+        style={{ '--dot': list.color ?? 'var(--list-purple)' } as CSSProperties}
       >
         {list.name}
       </span>

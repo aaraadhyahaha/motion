@@ -23,7 +23,7 @@ export default function TaskQueryView({ list, tag }: Props) {
         <>
           <TaskList tasks={tasks} />
           {q.isSuccess && !tasks.some((t) => !t.done) && (
-            <Empty icon={tag ? 'tag' : 'lists'} title="No open tasks" hint="Press N to add one." />
+            <Empty icon={tag ? 'tag' : 'lists'} title="Nothing open." hint="Press N to add one." />
           )}
           <div ref={more} aria-hidden />
         </>

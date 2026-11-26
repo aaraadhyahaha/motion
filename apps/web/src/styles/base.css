@@ -1,5 +1,15 @@
 /* #ui #type — reset, font, base elements. Values from tokens.css only. */
 @font-face {
+  font-family: "Instrument Serif";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap; /* not preloaded: Georgia fallback is close, keeps it off the critical path */
+  src: url("@fontsource/instrument-serif/files/instrument-serif-latin-400-normal.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
   font-family: "Inter Variable";
   font-style: normal;
   font-weight: 100 900;
@@ -31,7 +41,10 @@ body {
   font: var(--t-body-wt) var(--t-body-size) / var(--t-body-lh) var(--font);
   letter-spacing: var(--t-body-ls);
   color: var(--label);
-  background: var(--bg-grouped);
+  /* static paper grain (alpha baked into --grain; never on rows/cards) */
+  background: var(--grain), var(--bg-grouped);
+  caret-color: var(--tint);
+  scrollbar-color: var(--fill) transparent;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-synthesis-weight: none;
@@ -94,6 +107,7 @@ p {
   margin-inline: var(--s-4);
   border-radius: var(--r-group);
   background: var(--bg-grouped2);
+  box-shadow: var(--shadow-card);
   overflow: clip;
 }
 .inset-group > * {
@@ -109,7 +123,7 @@ p {
   content: "";
   position: absolute;
   inset: 0 0 auto var(--s-4);
-  border-top: var(--hairline) solid var(--separator);
+  border-top: var(--hairline) dashed var(--separator);
 }
 
 /* ── Buttons ── */
@@ -151,4 +165,9 @@ p {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* browser surfaces carry the palette */
+::selection {
+  background: color-mix(in srgb, var(--tint) 24%, transparent);
 }

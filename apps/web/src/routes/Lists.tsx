@@ -33,7 +33,10 @@ export default function Lists() {
                 href={`/list/${l.id}`}
                 label={l.name}
                 lead={
-                  <span className="dot" style={{ '--dot': l.color ?? 'var(--list-blue)' } as CSSProperties} />
+                  <span
+                    className="dot"
+                    style={{ '--dot': l.color ?? 'var(--list-purple)' } as CSSProperties}
+                  />
                 }
               />
             ))}

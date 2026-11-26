@@ -74,7 +74,11 @@ export function TaskList({ tasks, title, tone, showDate, sticky, keepDone }: Pro
 
   return (
     <section className="task-section" data-tone={tone} data-sticky={sticky || undefined}>
-      {title && <h2 className="task-section-title t-headline">{title}</h2>}
+      {title && (
+        <h2 className="task-section-title t-title3">
+          {title} <span className="task-count mono">{rows.filter((t) => !t.done).length || ''}</span>
+        </h2>
+      )}
       <ul className="task-list" ref={ref}>
         {rows.map((t) => (
           <TaskRow
