@@ -172,5 +172,6 @@
   position: sticky;
   top: var(--nav-h);
   z-index: 1;
-  background: var(--bg-grouped);
+  /* same grain as the page so the sticky band is invisible until it covers rows */
+  background: var(--grain), var(--bg-grouped);
 }
