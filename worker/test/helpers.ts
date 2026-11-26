@@ -12,3 +12,9 @@ export function testCtx(tz = 'UTC', start = T0): Ctx & { tick: (ms?: number) => 
   };
   return { db: makeDb(env.DB), tz, now: () => t, tick };
 }
+
+/** Cookie header for a live owner session (REST tests). */
+export async function sessionCookie(id = 'test-session'): Promise<string> {
+  await env.OAUTH_KV.put(`sess:${id}`, String(Date.now()));
+  return `sid=${id}`;
+}

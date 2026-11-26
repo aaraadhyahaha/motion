@@ -3,13 +3,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "mkdir -p ../apps/web/dist && wrangler dev",
     "typecheck": "tsc -p .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply motion --local",
-    "deploy": "wrangler deploy"
+    "deploy": "wrangler deploy",
+    "auth:hash": "node scripts/hash-password.mjs"
   },
   "dependencies": {
+    "@cloudflare/workers-oauth-provider": "^1.4.0",
     "@motion/core": "*",
     "chrono-node": "^2.10.3",
     "drizzle-orm": "^0.45.4",

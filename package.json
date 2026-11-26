@@ -15,7 +15,7 @@
     "check": "npm run typecheck && npm run lint && npm run build -w @motion/web && size-limit",
     "db:generate": "npm run db:generate -w @motion/worker",
     "db:migrate": "npm run db:migrate -w @motion/worker",
-    "deploy": "echo 'Blocked until Phase 3 (auth). Use: npm run deploy -w @motion/worker' && exit 1"
+    "deploy": "echo 'Blocked until Phase 5 (deploy). Use: npm run deploy -w @motion/worker' && exit 1"
   },
   "engines": {
     "node": ">=22"

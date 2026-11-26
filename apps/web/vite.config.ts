@@ -72,7 +72,8 @@ const pwa = VitePWA({
     globPatterns: ['**/*.{js,css,html,png}'],
     manifestTransforms: [shellOnly],
     navigateFallback: 'index.html',
-    navigateFallbackDenylist: [/^\/api(\/|$)/, /^\/mcp(\/|$)/],
+    // worker-owned paths (REST, MCP, OAuth + SSR login/consent) must never get the SPA shell
+    navigateFallbackDenylist: [/^\/(api|mcp|oauth|authorize|token|\.well-known)(\/|$)/],
     cleanupOutdatedCaches: true,
     runtimeCaching: [
       {
@@ -101,7 +102,7 @@ const pwa = VitePWA({
 
 export default defineConfig({
   plugins: [react(), preloadInter(), pwa],
-  server: { proxy: { '/api': 'http://localhost:8787' } },
+  server: { proxy: { '^/(api|mcp|oauth|authorize|token|\\.well-known)(/|$)': 'http://localhost:8787' } },
   build: {
     target: 'es2022',
     manifest: true,

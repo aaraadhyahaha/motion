@@ -1,0 +1,2 @@
+# Copy to worker/.dev.vars (gitignored). Generate with: npm run auth:hash -w @motion/worker
+OWNER_PW_HASH=pbkdf2.100000.REPLACE.REPLACE

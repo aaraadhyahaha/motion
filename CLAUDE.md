@@ -20,7 +20,7 @@ Full plan: `plans/2026-11-26-foundation.md`. Decisions: `docs/DECISIONS.md`.
 - `npm run typecheck` · `npm run check` (typecheck + lint + size-limit)
 - `npm run db:generate` · `npm run db:migrate` (local D1)
 - `npm run deploy` — ask before running
-- `npm run lint` (Biome). Root `deploy` is blocked until Phase 3 auth exists.
+- `npm run lint` (Biome). Root `deploy` is blocked until Phase 5 (deploy).
 (All commands live as of Step 1. Backend rules: `worker/CLAUDE.md`.)
 
 ## Rules

@@ -54,3 +54,12 @@ Measured with esbuild minify + gzip, tree-shaken to what we import.
 - `@fontsource-variable/inter` 5.3.0 · 0 KB JS; one asset `inter-latin-wght-normal.woff2` 47.1 KB (already compressed) · Inter fallback font, latin subset. Dev.
 - `@fontsource/instrument-serif` 5.2.5 · 0 KB JS; one asset `instrument-serif-latin-400-normal.woff2` 21.0 KB, not preloaded (`swap`, Georgia fallback) · Atelier display serif for large/section titles. Dev.
 - Dev only (no runtime cost): `typescript`, `vitest`, `@cloudflare/vitest-plugin`, `wrangler`, `@cloudflare/workers-types`, `drizzle-kit`, `@biomejs/biome`, `vite`, `@vitejs/plugin-react`, `size-limit`, `@size-limit/file`, `@types/react*`. Phase 2 dev deps listed above.
+- 2026-11-26 · #auth · Dep `@cloudflare/workers-oauth-provider` 1.4 — worker bundle 60→107 KB gz (~45 KB is the provider; worker-only, 0 web bytes). Gives PKCE, DCR, RFC 8414/9728 metadata, hashed tokens in KV, refresh rotation.
+- 2026-11-26 · #auth · Owner login = password (PBKDF2-SHA256 100k via WebCrypto, `OWNER_PW_HASH` secret; 5 fails/15 min/IP). Passkey deferred — needs a lib + bootstrap flow, ties to rpID.
+- 2026-11-26 · #auth · Tokens: access 1 h, refresh 30 d rotated; PKCE S256 enforced in `/authorize`; redirect origins allow-listed (`OAUTH_REDIRECT_ALLOW`: claude.ai, claude.com, Inspector localhost:6274).
+- 2026-11-26 · #auth · PWA session = KV `sess:*` + httpOnly `SameSite=Lax` cookie (`__Host-sid` on https). Lax so the claude.ai popup's top-level return carries it. CSRF: `Sec-Fetch-Site` (works behind the Vite proxy), Origin fallback.
+- 2026-11-26 · #deploy · PWA served by the worker (static assets, SPA fallback, `run_worker_first` for worker paths) — one origin so the cookie needs zero web JS.
+- 2026-11-26 · #mcp · Hand-rolled stateless MCP (JSON-RPC over POST → JSON, no SSE/sessions, 0 deps) instead of `@modelcontextprotocol/sdk` (pulls classic zod) / `agents` (Durable Object). Swap is local to `mcp/server.ts`.
+- 2026-11-26 · #mcp · Invalid tool arguments → tool result `isError` (model can self-correct), not JSON-RPC -32602; unknown tool → -32602.
+- 2026-11-26 · #mcp · `quick_add` is its own tool (NL text) next to structured `create_task` — one schema each beats a union.
+- 2026-11-26 · #perf · Web 401 hook (+52 B gz) offset by moving Icon stroke attrs to CSS + Referer-based login `next`: initial JS 89.91 → 89.89 KB.

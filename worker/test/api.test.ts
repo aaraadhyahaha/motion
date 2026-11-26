@@ -1,10 +1,16 @@
 import { exports } from 'cloudflare:workers';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { sessionCookie } from './helpers';
+
+let cookie = '';
+beforeAll(async () => {
+  cookie = await sessionCookie();
+});
 
 const call = (method: string, path: string, body?: unknown) =>
-  exports.default.fetch(`http://x/api${path}`, {
+  exports.default.fetch(`http://localhost/api${path}`, {
     method,
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', cookie },
     ...(body !== undefined && { body: typeof body === 'string' ? body : JSON.stringify(body) }),
   });
 const json = async (res: Response) => (await res.json()) as Record<string, any>;

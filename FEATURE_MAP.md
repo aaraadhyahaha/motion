@@ -18,7 +18,7 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | Feature | Files | Tests | Status |
 |---|---|---|---|
 | Schema + migrations | `worker/src/db/schema.ts`, `worker/migrations/`, `worker/drizzle.config.ts` | `worker/test/setup.ts` | ✅ |
-| D1 client + config | `worker/src/db/client.ts`, `worker/wrangler.jsonc`, `worker/src/env.ts` | — | ✅ |
+| D1 client + config (KV `OAUTH_KV`, `OAUTH_REDIRECT_ALLOW`, static assets = `apps/web/dist` same origin, `run_worker_first` for worker paths) | `worker/src/db/client.ts`, `worker/wrangler.jsonc`, `worker/src/env.ts` | — | ✅ |
 
 ## #task / #list — domain
 
@@ -44,9 +44,15 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 
 | Feature | Files | Tests | Status |
 |---|---|---|---|
-| MCP server | `worker/src/mcp/server.ts` | — | ⬜ |
-| MCP tools | `worker/src/mcp/tools/*.ts` | `worker/test/mcp.test.ts` | ⬜ |
-| OAuth + owner login | `worker/src/auth/*.ts` | — | ⬜ |
+| MCP server (stateless Streamable HTTP, hand-rolled JSON-RPC: initialize/ping/tools/list/tools/call) | `worker/src/mcp/server.ts`, `worker/src/mcp/tool.ts` (`defineTool`, JSON schema via `z.toJSONSchema`) | `worker/test/mcp.test.ts` | ✅ |
+| MCP tools (13, one per file, thin over services; registry `index.ts`) | `worker/src/mcp/tools/*.ts` | `worker/test/mcp.test.ts` | ✅ |
+| Reschedule service (ISO or NL `when`) | `worker/src/services/reschedule.ts` | `worker/test/mcp.test.ts` | ✅ |
+| OAuth 2.1 provider wiring (PKCE S256, DCR `/oauth/register`, `/authorize`, `/token`, RFC 8414/9728 metadata; one provider per origin) | `worker/src/index.ts` | `worker/test/auth.test.ts` | ✅ |
+| Owner login/logout + consent (redirect allowlist, CSRF, rate limit, Referer `next`) | `worker/src/auth/routes.ts` | `worker/test/auth.test.ts` | ✅ |
+| SSR auth pages (Atelier tokens inlined, no JS, strict CSP) | `worker/src/auth/pages.ts` | `worker/test/auth.test.ts` | ✅ |
+| Cookie session + `/api` guard (KV `sess:*`, Sec-Fetch-Site/Origin CSRF) | `worker/src/auth/session.ts`, `worker/src/api/index.ts` | `worker/test/auth.test.ts` | ✅ |
+| Password hash (PBKDF2, WebCrypto) + `auth:hash` script | `worker/src/auth/password.ts`, `worker/scripts/hash-password.mjs`, `worker/.dev.vars.example` | `worker/test/auth.test.ts` | ✅ |
+| Test helpers: real OAuth flow, `sessionCookie()` | `worker/test/oauth.ts`, `worker/test/helpers.ts` | — | ✅ |
 
 ## #ui / #type / #anim / #pwa
 
@@ -54,10 +60,10 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 |---|---|---|---|
 | Design tokens (HIG base + Atelier layer: warm semantic colors, clay tint/tint-ink, list inks, serif/mono, card shadow, grain; springs, reduced-motion/-transparency) | `apps/web/src/styles/tokens.css`, spec `plans/2026-11-26-atelier.md` | shots | ✅ |
 | Base styles (grain, themed selection/caret/scrollbar) + Inter @font-face (preloaded via `preloadInter` in vite.config) + Instrument Serif @font-face (not preloaded) | `apps/web/src/styles/base.css`, `apps/web/src/main.tsx` | — | ✅ |
-| Icons (inline SVG paths) | `apps/web/src/components/Icon.tsx` | — | ✅ |
+| Icons (inline SVG paths; stroke style in `base.css` `svg {}`) | `apps/web/src/components/Icon.tsx` | — | ✅ |
 | Web scaffold (main: QueryClientProvider + startSync + ensureTz) | `apps/web/{index.html,package.json}`, `apps/web/src/{main,App}.tsx` | — | ✅ |
 | Router (History API, `?t=` param) + spring mirror | `apps/web/src/lib/{router,springs}.ts` | `apps/web/src/lib/router.test.ts` | ✅ |
-| Web data layer (fetch/ApiError, QueryClient, keys, queries, optimistic mutations, first-run tz) | `apps/web/src/data/{api,client,keys,queries,mutations,tz}.ts` | — | ✅ |
+| Web data layer (fetch/ApiError, 401 → `/oauth/login`, QueryClient, keys, queries, optimistic mutations, first-run tz) | `apps/web/src/data/{api,client,keys,queries,mutations,tz}.ts` | — | ✅ |
 | Cache helpers (pure patchTask/removeTask) | `apps/web/src/data/cache.ts` | `apps/web/src/data/cache.test.ts` | ✅ |
 | Changes poller (visibility-gated, backoff, echo dedupe) | `apps/web/src/data/sync.ts` | `apps/web/src/data/sync.test.ts` | ✅ |
 | Toast store (undo) | `apps/web/src/ui/store.ts` | — | ✅ |
@@ -76,8 +82,8 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | Editor sheet (`?t=<id>`, LazyMotion, seeded from cached rows, save-on-close diff PATCH, delete) | `apps/web/src/editor/EditorSheet.tsx`, `apps/web/src/data/queries.ts` (`useTask` seed) | `apps/web/e2e/smoke.spec.ts` | ✅ |
 | Sheet (bottom/centered, springs, drag-dismiss, focus trap, Esc, scrim) + pickers (dates, repeat, tags) | `apps/web/src/editor/{Sheet,DateFields,RepeatPicker,TagInput}.tsx`, `apps/web/src/styles/sheet.css`, `apps/web/src/styles/tokens.css` (`--scrim`, `--sheet-*`, `--grabber-*`) | `apps/web/e2e/smoke.spec.ts`, shots | ✅ |
 | Completion celebration | `apps/web/src/celebrate/*` | — | ⬜ |
-| PWA manifest + SW (precache shell · CacheFirst `/assets` · NetworkFirst `/api` GET) | `apps/web/vite.config.ts`, `apps/web/index.html` (metas), `apps/web/public/icons/*` | — | ✅ |
-| E2E smoke + screenshots (isolated D1 `worker/.wrangler/e2e`, wrangler :8787 + vite :5173, phone/desktop, SW blocked; shots → `e2e/shots/` gitignored) | `apps/web/playwright.config.ts`, `apps/web/e2e/{seed,smoke.spec,shots.spec}.ts`, `apps/web/e2e/tsconfig.json` | `npm run test:e2e -w @motion/web` | ✅ |
+| PWA manifest + SW (precache shell · CacheFirst `/assets` · NetworkFirst `/api` GET · nav denylist api/mcp/oauth/authorize/token/.well-known) · dev proxy of worker paths | `apps/web/vite.config.ts`, `apps/web/index.html` (metas), `apps/web/public/icons/*` | — | ✅ |
+| E2E smoke + screenshots + auth (setup project logs in → storageState; isolated D1 `worker/.wrangler/e2e`, wrangler :8787 + vite :5173, phone/desktop, SW blocked; shots → `e2e/shots/` gitignored) | `apps/web/playwright.config.ts`, `apps/web/e2e/{auth.setup,auth.spec,auth}.ts`, `apps/web/e2e/{seed,smoke.spec,shots.spec}.ts`, `apps/web/e2e/tsconfig.json` | `npm run test:e2e -w @motion/web` | ✅ |
 
 ## #sched / #recur
 

@@ -19,6 +19,8 @@ export async function api<T>(method: Method, path: string, body?: unknown, signa
     headers: body === undefined ? undefined : { 'content-type': 'application/json' },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+  // session gone → worker login page (it returns to the same-origin Referer)
+  if (res.status === 401) location.assign('/oauth/login');
   if (res.status === 204) return undefined as T;
   const data = await res.json().catch(() => null);
   if (!res.ok) {

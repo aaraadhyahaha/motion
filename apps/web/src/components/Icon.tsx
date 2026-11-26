@@ -1,4 +1,4 @@
-// #ui inline SVG icon set (24-grid, stroke = currentColor). No icon library.
+// #ui inline SVG icon set (24-grid). Stroke styling lives in base.css `svg {}` (bytes off the JS budget). No icon library.
 const paths = {
   today:
     'M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 17.5zM4 9h16M8 2.5v3M16 2.5v3M12 12.5v4',
@@ -32,11 +32,6 @@ export function Icon({ name, size = 22, label, className }: Props) {
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
       className={className}
       role={label ? 'img' : undefined}
       aria-label={label}

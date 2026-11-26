@@ -9,3 +9,4 @@ dist/
 playwright-report/
 test-results/
 apps/web/e2e/shots/
+apps/web/e2e/.auth.json
