@@ -1,0 +1,38 @@
+{
+  "name": "motion",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "worker",
+    "apps/web"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @motion/worker & npm run dev -w @motion/web; wait",
+    "test": "vitest run",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "biome check .",
+    "check": "npm run typecheck && npm run lint && npm run build -w @motion/web && size-limit",
+    "db:generate": "npm run db:generate -w @motion/worker",
+    "db:migrate": "npm run db:migrate -w @motion/worker",
+    "deploy": "echo 'Blocked until Phase 3 (auth). Use: npm run deploy -w @motion/worker' && exit 1"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.9",
+    "@size-limit/file": "^14.3.0",
+    "size-limit": "^14.3.0",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.12"
+  },
+  "allowScripts": {
+    "esbuild@0.18.20": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.1": true,
+    "esbuild@0.28.2": true,
+    "workerd@1.20260815.1": true,
+    "workerd@1.20261123.1": true
+  }
+}

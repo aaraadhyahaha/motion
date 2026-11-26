@@ -1,0 +1,5 @@
+/* Design tokens — filled in Phase 2 (HIG type scale, semantic colors, springs). */
+:root {
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, "Inter", sans-serif;
+}

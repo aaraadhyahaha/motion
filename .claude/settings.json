@@ -1,0 +1,13 @@
+{
+  "plansDirectory": "./plans",
+  "permissions": {
+    "deny": [
+      "Read(./node_modules/**)",
+      "Read(./**/node_modules/**)",
+      "Read(./**/dist/**)",
+      "Read(./**/.wrangler/**)",
+      "Read(./package-lock.json)",
+      "Read(./worker/migrations/meta/**)"
+    ]
+  }
+}
