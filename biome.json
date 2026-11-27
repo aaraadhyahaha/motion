@@ -11,7 +11,7 @@
       "!apps/web/e2e/.auth.json",
       "!scripts/gz-baseline.json",
       "!.claude",
-      "!.impeccable",
+      "!**/.impeccable",
       "!**/test-results",
       "!**/playwright-report",
       "!**/*.md"
