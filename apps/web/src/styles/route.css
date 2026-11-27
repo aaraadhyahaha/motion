@@ -1,0 +1,21 @@
+/* #anim route change: CSS-only rise-in (startTransition keeps the old view until the new one is ready). */
+/* the header only fades: it holds the fixed nav bar, which a transform would re-anchor */
+.content-inner > :not(.page-header, [class^="sheet"]),
+.page-title,
+.page-subtitle {
+  animation: route-in var(--dur-route-in) var(--ease-out) backwards;
+}
+.page-header {
+  animation: route-fade var(--dur-route-in) var(--ease-out) backwards;
+}
+@keyframes route-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--route-rise));
+  }
+}
+@keyframes route-fade {
+  from {
+    opacity: 0;
+  }
+}

@@ -1,4 +1,5 @@
-/* #anim celebration canvas + "Today's done" card. Lazy (celebrate chunk). transform/opacity only. */
+/* #anim milestone burst canvas + the "Today's done" teacup moment. Lazy (celebrate chunk).
+   transform / opacity / clip-path only; one sequence, no loops. */
 .celebrate-canvas {
   position: fixed;
   inset: 0;
@@ -7,60 +8,83 @@
   pointer-events: none;
   z-index: 50;
 }
-.celebrate-card {
-  position: fixed;
-  left: 50%;
-  top: 38%;
-  z-index: 51;
-  display: grid;
-  gap: var(--s-1);
-  min-width: 15rem;
-  padding: var(--s-6) var(--s-8);
-  border-radius: var(--r-sheet);
-  text-align: center;
-  color: var(--label);
-  background: var(--material-sheet-bg);
-  -webkit-backdrop-filter: var(--material-blur);
-  backdrop-filter: var(--material-blur);
-  box-shadow: var(--shadow-card);
-  cursor: pointer;
-  translate: -50% -50%;
-  animation:
-    celebrate-in var(--spring-bouncy) both,
-    celebrate-out var(--fade) var(--dur-hold) forwards;
+
+/* ── "Today's done": waits for the last row to leave, steam rises, the serif title inks in ── */
+.content-inner > .empty[data-moment] {
+  animation: moment-fade var(--dur-route-in) var(--ease-out) var(--moment-delay) backwards;
 }
-.celebrate-title {
+.empty[data-moment] .empty-cup,
+.empty-steam {
+  grid-area: 1 / 1;
+}
+/* the cup's resting steam gives way to the rising layers */
+.empty[data-moment] .empty-cup::before {
+  opacity: 0;
+}
+.empty-steam {
+  position: relative;
+  width: var(--cup-size);
+  height: var(--cup-size);
+  pointer-events: none;
+}
+/* center wisp rises first, the outer two follow (each pseudo is its own masked layer; the box is unmasked) */
+.empty-steam::before,
+.empty-steam::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--tint);
+  -webkit-mask: var(--steam) no-repeat center / contain;
+  mask: var(--steam) no-repeat center / contain;
+  transform-origin: 50% 34%; /* the cup's rim */
+  animation: moment-steam var(--dur-steam) var(--ease-out) var(--moment-delay) backwards;
+}
+.empty-steam::before {
+  --steam: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56 56' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M28 18c-3-3 3-5 0-9'/%3E%3C/svg%3E");
+}
+.empty-steam::after {
+  --steam: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 56 56' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M19 18c-3-3 3-5 0-9M37 18c-3-3 3-5 0-9'/%3E%3C/svg%3E");
+  animation-delay: calc(var(--moment-delay) + var(--steam-stagger));
+}
+.empty[data-moment] .empty-title {
   font-family: var(--font-serif);
-  font-size: var(--t-large-title-size);
-  line-height: var(--t-large-title-lh);
+  font-size: var(--t-title1-size);
+  line-height: var(--t-title1-lh);
   color: var(--tint-ink);
+  animation: moment-ink var(--dur-ink) var(--ease-out) calc(var(--moment-delay) + var(--steam-stagger) * 2)
+    backwards;
 }
-@keyframes celebrate-in {
+.empty[data-moment] .empty-hint {
+  animation: moment-fade var(--dur-route-in) var(--ease-out)
+    calc(var(--moment-delay) + var(--steam-stagger) * 2 + var(--dur-ink)) backwards;
+}
+
+@keyframes moment-fade {
   from {
     opacity: 0;
-    transform: scale(0.85);
   }
 }
-@keyframes celebrate-out {
+@keyframes moment-steam {
+  from {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+}
+@keyframes moment-ink {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
   to {
-    opacity: 0;
-    transform: scale(0.96);
+    clip-path: inset(0); /* explicit: inset() ↔ none would flip discretely */
   }
 }
+
+/* reduced motion: no rise, no wipe — the steam and title fade in on the same beats */
 @media (prefers-reduced-motion: reduce) {
-  .celebrate-card {
-    animation:
-      celebrate-fade var(--fade) both,
-      celebrate-out var(--fade) var(--dur-hold) forwards;
-  }
-  @keyframes celebrate-out {
-    to {
-      opacity: 0;
-    }
-  }
-}
-@keyframes celebrate-fade {
-  from {
-    opacity: 0;
+  .empty-steam::before,
+  .empty-steam::after,
+  .empty[data-moment] .empty-title {
+    animation-name: moment-fade;
+    animation-duration: var(--dur-fade);
   }
 }

@@ -12,58 +12,39 @@
   border: 0;
 }
 .search-input::placeholder {
-  color: var(--label3);
+  color: var(--placeholder);
 }
-.search-input:focus-visible {
-  outline: 0;
-  box-shadow: var(--focus-ring);
+/* native clear button → a drawn ink × (Chrome/Safari paint a blue glyph otherwise) */
+.search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--search-clear);
+  height: var(--search-clear);
+  margin-inline-start: var(--s-2);
+  border-radius: var(--r-pill);
+  background: var(--label2);
+  -webkit-mask: var(--search-clear-glyph) center / contain no-repeat;
+  mask: var(--search-clear-glyph) center / contain no-repeat;
+  cursor: pointer;
+}
+@media (forced-colors: active) {
+  .search-input::-webkit-search-cancel-button {
+    background: ButtonText;
+  }
 }
 
-button.inset-item {
-  width: 100%;
-  text-align: start;
-}
-.settings-note {
-  margin: var(--s-2) var(--s-8) 0;
-  color: var(--label2);
-}
+/* settings: rows, note and the switch live in base.css (shared with the editor) */
 .settings-logout {
   justify-content: center;
-  color: var(--red);
 }
-.switch {
-  appearance: none;
-  flex: none;
-  position: relative;
-  width: var(--switch-w);
-  height: var(--switch-h);
-  border-radius: var(--r-pill);
-  background: var(--fill);
-  transition: background-color var(--fade);
-}
-/* the knob moves with transform; the 44pt target is the whole row (label) */
-.switch::before {
-  content: "";
-  position: absolute;
-  --gap: calc(var(--s-1) / 2);
-  inset: var(--gap) auto var(--gap) var(--gap);
-  aspect-ratio: 1;
-  border-radius: var(--r-pill);
-  background: var(--bg);
-  box-shadow: var(--shadow-card);
-  transition: transform var(--spring-snappy);
-}
-.switch:focus-visible {
-  border-radius: var(--r-pill);
-}
-.switch:checked {
-  background: var(--green);
-}
-.switch:checked::before {
-  transform: translateX(calc(var(--switch-w) - var(--switch-h)));
+.settings-kbd {
+  color: var(--label2);
 }
 
 .help {
+  --help-from: scale(var(--overlay-scale));
+  --help-in: var(--overlay-pop);
+  --help-out: var(--dur-fade) var(--ease-in);
   margin: auto;
   width: min(30rem, calc(100% - 2 * var(--s-4)));
   padding: var(--s-6);
@@ -73,11 +54,42 @@ button.inset-item {
   color: var(--label);
   box-shadow: var(--shadow-card);
 }
+/* phone: bottom sheet, like the editor */
+@media (max-width: 767px) {
+  .help {
+    --help-from: translateY(100%);
+    --help-in: var(--overlay-in);
+    --help-out: var(--overlay-out);
+    margin: auto 0 0;
+    width: 100%;
+    max-width: 100%;
+    padding-bottom: calc(var(--s-6) + var(--safe-bottom));
+    border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  }
+  .help form .btn {
+    flex: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .help {
+    --help-from: none;
+    --help-out: var(--dur-fade) var(--ease-in);
+  }
+}
 .help[open] {
-  animation: help-in var(--spring-snappy);
+  animation:
+    help-in var(--help-in),
+    fade-in var(--fade);
+}
+.help.closing {
+  animation: help-out var(--help-out) forwards;
 }
 .help::backdrop {
   background: var(--scrim);
+  animation: fade-in var(--dur-scrim) linear;
+}
+.help.closing::backdrop {
+  animation: help-fade-out var(--help-out) forwards;
 }
 .help dl {
   display: grid;
@@ -97,7 +109,17 @@ button.inset-item {
 }
 @keyframes help-in {
   from {
+    transform: var(--help-from);
+  }
+}
+@keyframes help-out {
+  to {
     opacity: 0;
-    transform: scale(0.96);
+    transform: var(--help-from);
+  }
+}
+@keyframes help-fade-out {
+  to {
+    opacity: 0;
   }
 }

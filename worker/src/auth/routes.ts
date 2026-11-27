@@ -9,6 +9,8 @@ import { csrfToken, endSession, getSession, sameOrigin, startSession } from './s
 type C = Context<{ Bindings: Env }>;
 const MAX_FAILS = 5;
 const WINDOW_S = 900;
+const MAX_ALL = 30;
+const RL_ALL = 'rl:*';
 
 const html = (c: C, body: string, status: 200 | 400 | 403 | 429 = 200, formTo = '') =>
   c.html(body, status, {
@@ -63,12 +65,22 @@ export const auth = new Hono<{ Bindings: Env }>()
     if (!sameOrigin(c)) return html(c, errorPage('Cross-origin sign-in blocked.'), 403);
     const form = await c.req.parseBody();
     const next = safeNext(form.next);
-    const rl = `rl:${c.req.header('cf-connecting-ip') ?? 'local'}`;
-    const fails = Number((await c.env.OAUTH_KV.get(rl)) ?? 0);
-    if (fails >= MAX_FAILS)
+    // per-IP + global ceiling (distributed guessing). On the CF edge the IP header always exists:
+    // missing on https = misrouted → fail closed rather than share one bucket.
+    const ip = c.req.header('cf-connecting-ip');
+    if (!ip && c.req.url.startsWith('https:')) return html(c, errorPage('Sign-in unavailable.'), 400);
+    const rl = `rl:${ip ?? 'local'}`;
+    const [fails = 0, all = 0] = (await Promise.all([rl, RL_ALL].map((k) => c.env.OAUTH_KV.get(k)))).map(
+      Number,
+    );
+    if (fails >= MAX_FAILS || all >= MAX_ALL)
       return html(c, loginPage(next, 'Too many attempts. Try again in 15 minutes.'), 429);
     if (!(await verifyPassword(String(form.password ?? ''), c.env.OWNER_PW_HASH))) {
-      await c.env.OAUTH_KV.put(rl, String(fails + 1), { expirationTtl: WINDOW_S });
+      const ttl = { expirationTtl: WINDOW_S };
+      await Promise.all([
+        c.env.OAUTH_KV.put(rl, String(fails + 1), ttl),
+        c.env.OAUTH_KV.put(RL_ALL, String(all + 1), ttl),
+      ]);
       return html(c, loginPage(next, 'Wrong password.'), 403);
     }
     await c.env.OAUTH_KV.delete(rl);

@@ -46,7 +46,7 @@ export default defineConfig({
     {
       name: 'pwa',
       dependencies: ['setup'],
-      testMatch: /pwa\.spec\.ts/,
+      testMatch: /e2e\/pwa\.spec\.ts$/, // not e2e/prod/ (deployed-origin config)
       use: {
         ...devices['Desktop Chrome'],
         baseURL: 'http://localhost:8787',

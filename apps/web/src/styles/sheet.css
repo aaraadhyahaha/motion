@@ -22,15 +22,15 @@
   flex-direction: column;
   border-radius: var(--r-sheet) var(--r-sheet) 0 0;
   padding-bottom: var(--safe-bottom);
-  background: var(--material-sheet-bg);
-  -webkit-backdrop-filter: var(--material-blur);
-  backdrop-filter: var(--material-blur);
+  /* Atelier paper card: solid paper + static grain (no blur needed under an opaque card) */
+  background: var(--grain), var(--bg-grouped2);
+  box-shadow: var(--shadow-card);
   border: var(--hairline) solid var(--separator);
   border-bottom: 0;
 }
 /* focus lands on the dialog itself (trap anchor, tabIndex -1) — not an interactive control, no ring */
 .sheet:focus-visible {
-  box-shadow: none;
+  outline: 0;
 }
 @media (min-width: 768px) {
   .sheet-pos {
@@ -75,28 +75,28 @@
   align-items: center;
   padding-inline: var(--s-2);
 }
-.sheet-bar .btn:not(.sheet-del) {
-  color: var(--tint-ink);
-  font-weight: 600;
-}
-.sheet-del {
-  color: var(--red);
-}
 .sheet-body {
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-bottom: var(--s-4);
 }
 
-/* ── Fields ── */
+/* ── Fields: ink-ruled lines on the paper card (no nested cards) ── */
 .ed-pad {
   padding: var(--s-4);
+}
+.ed-status {
+  display: grid;
+  justify-items: start;
+  gap: var(--s-1);
+  color: var(--label2);
 }
 .ed-title,
 .ed-notes {
   display: block;
-  width: 100%;
-  padding: var(--s-2) var(--s-4);
+  width: calc(100% - 2 * var(--s-4));
+  margin-inline: var(--s-4);
+  padding-block: var(--s-2);
   background: none;
   border: 0;
   outline: 0;
@@ -104,41 +104,37 @@
 }
 .ed-title {
   min-height: var(--tap);
-  font: 400 26px / 1.2 var(--font-serif);
 }
 .ed-notes {
   resize: none;
   field-sizing: content;
   min-height: var(--tap);
   color: var(--label2);
+  border-bottom: var(--rule);
 }
 .ed-notes::placeholder,
 .ed-tag-input::placeholder {
-  color: var(--label3);
+  color: var(--placeholder);
 }
 .ed-group {
   margin-top: var(--s-4);
 }
-/* paper cards, dashed inset separators */
+/* inside the sheet an inset group is flat ruled paper: every field sits on its own dashed line */
 .sheet .inset-group {
-  box-shadow: var(--shadow-card);
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
 }
-.sheet .inset-group > * + *::before {
-  border-top: 1px dashed var(--separator);
+.sheet .inset-item {
+  padding-inline: 0;
+  border-bottom: var(--rule);
 }
-.ed-row {
-  min-height: var(--tap);
+.sheet .inset-item::before {
+  content: none;
 }
-.ed-icon {
-  width: var(--s-6);
-  display: flex;
-  justify-content: center;
-  color: var(--label2);
-  flex: none;
-}
-.ed-label {
-  flex: 1;
-  color: var(--label);
+.sheet .inset-note {
+  margin-inline: var(--s-4);
 }
 .ed-native {
   min-height: var(--tap);
@@ -150,18 +146,15 @@
   color: var(--label2);
   accent-color: var(--tint);
 }
-.ed-native:disabled {
-  opacity: 0.4;
-}
-.ed-native:focus-visible {
-  box-shadow: var(--focus-ring);
+.ed-native:focus-visible,
+.ed-title:focus-visible,
+.ed-notes:focus-visible,
+.ed-tag-input:focus-visible {
+  outline: var(--focus-w) solid var(--focus-ring);
+  outline-offset: var(--focus-offset);
 }
 .ed-num {
   width: calc(var(--tap) * 1.5);
-}
-.ed-hint {
-  padding: var(--s-2) var(--s-8) 0;
-  color: var(--label2);
 }
 
 /* chips (quick dates, tag suggestions) */
@@ -179,11 +172,12 @@
 .ed-chip,
 .ed-day {
   min-height: var(--tap);
-  padding-inline: var(--s-3);
+  padding-inline: var(--chip-pad);
   border-radius: var(--r-pill);
   background: var(--fill3);
   color: var(--label);
-  font-size: 15px;
+  font: var(--t-subhead-wt) var(--t-subhead-size) / var(--t-subhead-lh) var(--font);
+  letter-spacing: var(--t-subhead-ls);
   transition:
     transform var(--spring-snappy),
     opacity var(--fade);
@@ -191,12 +185,13 @@
 .ed-chip:active,
 .ed-day:active {
   transform: scale(var(--press-scale));
+  transition: transform var(--press);
 }
 .ed-chip[aria-pressed="true"],
 .ed-day[aria-pressed="true"] {
   background: var(--tint);
   color: var(--on-tint);
-  font-weight: 600;
+  font-weight: var(--t-headline-wt);
 }
 
 /* weekday toggles: 7 round 44px targets */
@@ -209,59 +204,24 @@
   padding: 0;
 }
 
-/* iOS-style switch on a native checkbox (transform/opacity only for the knob) */
-.ed-switch {
-  appearance: none;
-  position: relative;
-  width: calc(var(--tap) * 1.16);
-  height: calc(var(--tap) * 0.7);
-  border-radius: var(--r-pill);
-  background: var(--fill);
-  flex: none;
-  cursor: pointer;
-}
-.ed-switch::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--green);
-  opacity: 0;
-  transition: opacity var(--fade);
-}
-.ed-switch::after {
-  content: "";
-  position: absolute;
-  top: var(--s-1);
-  left: var(--s-1);
-  width: calc(var(--tap) * 0.7 - var(--s-2));
-  aspect-ratio: 1;
-  border-radius: var(--r-pill);
-  background: var(--bg3);
-  transition: transform var(--spring-snappy);
-}
-.ed-switch:checked::before {
-  opacity: 1;
-}
-.ed-switch:checked::after {
-  transform: translateX(calc(var(--tap) * 0.46));
-}
-
 /* tag tokens */
 .ed-tags {
   flex-wrap: wrap;
   gap: var(--s-1);
   padding-block: var(--s-1);
 }
+/* value chip: same pill + type as .ed-chip, clay wash (shared look with quick-add .chip) */
 .ed-token {
   min-height: var(--tap);
-  padding-inline: var(--s-3) var(--s-2);
+  padding-inline: var(--chip-pad) var(--s-2);
   display: inline-flex;
   align-items: center;
   gap: var(--s-1);
   border-radius: var(--r-pill);
-  background: color-mix(in srgb, var(--tint) 12%, transparent);
-  color: var(--tint-ink);
+  background: var(--chip-bg);
+  color: var(--chip-ink);
+  font: var(--t-subhead-wt) var(--t-subhead-size) / var(--t-subhead-lh) var(--font);
+  letter-spacing: var(--t-subhead-ls);
 }
 .ed-tag-input {
   flex: 1;

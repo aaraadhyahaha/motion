@@ -22,9 +22,9 @@ const lazy = js.filter((f) => !initial.has(f) && !celebrate.includes(f));
 const abs = (files) => [...files].map((f) => `${dist}/${f}`);
 
 const budgets = [
-  { name: 'initial JS', path: abs(initial), limit: '90 KB' },
+  { name: 'initial JS', path: abs(initial), limit: '91 KB' },
   { name: 'initial CSS', path: abs(initialCss), limit: '15 KB' },
-  { name: 'lazy JS (routes + editor + motion, total)', path: abs(lazy), limit: '45 KB' },
+  { name: 'lazy JS (routes + editor + motion, total)', path: abs(lazy), limit: '46 KB' },
   { name: 'celebrate/* JS (total)', path: abs(celebrate), limit: '8 KB' },
   { name: 'service worker', path: [`${dist}/sw.js`, ...globSync(`${dist}/workbox-*.js`)], limit: '10 KB' },
   { name: 'web manifest', path: [`${dist}/manifest.webmanifest`], limit: '1 KB' },

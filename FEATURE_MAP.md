@@ -13,6 +13,9 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | Claude settings | `.claude/settings.json` | — | ✅ |
 | Workspaces + tooling | `package.json`, `tsconfig.base.json`, `biome.json`, `vitest.config.ts` (projects: core, worker, web), `apps/web/vitest.config.ts`, `.size-limit.js` (manifest-based budgets: initial/lazy/celebrate/SW/webmanifest), `*/package.json`, `package.json` `overrides` (audit: glob, esbuild) | — | ✅ |
 | Exact gz bytes per chunk vs baseline (`--save`, `--changed`) | `scripts/gz.mjs`, `scripts/gz-baseline.json` | — | ✅ |
+| Deploy pipeline (root `deploy` = check + test + worker deploy; worker `db:migrate:remote`, `db:export`) + deployed-origin smoke (public + `--auth`) | `package.json`, `worker/package.json`, `scripts/smoke.mjs` | `node scripts/smoke.mjs <ORIGIN> [--auth]` (prod 2026-11-27: 21/21 public, 33/33 auth) | ✅ |
+| Local demo (fresh isolated D1 `worker/.wrangler/demo`, relative-date mock lists/tags/tasks, password `demo`, wrangler :8787 + vite :5173) | `scripts/demo.mjs`, `package.json` (`demo`) | `npm run demo` | ✅ |
+| Worker config (`global_fetch_strictly_public`, `preview_urls: false`, prod `OAUTH_REDIRECT_ALLOW`, D1/KV ids) | `worker/wrangler.jsonc`, `worker/.dev.vars.example` | — | ✅ |
 
 ## #db — data
 
@@ -49,7 +52,8 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | MCP tools (13, one per file, thin over services; registry `index.ts`) | `worker/src/mcp/tools/*.ts` | `worker/test/mcp.test.ts` | ✅ |
 | Reschedule service (ISO or NL `when`) | `worker/src/services/reschedule.ts` | `worker/test/mcp.test.ts` | ✅ |
 | OAuth 2.1 provider wiring (PKCE S256, DCR `/oauth/register`, `/authorize`, `/token`, RFC 8414/9728 metadata; one provider per origin) | `worker/src/index.ts` | `worker/test/auth.test.ts` | ✅ |
-| Owner login/logout + consent (redirect allowlist, CSRF, rate limit, Referer `next`) | `worker/src/auth/routes.ts` | `worker/test/auth.test.ts` | ✅ |
+| Owner login/logout + consent (redirect allowlist, CSRF, rate limit per IP + global 30/15 min `rl:*`, fail closed without `cf-connecting-ip` on https, Referer `next`) | `worker/src/auth/routes.ts` | `worker/test/auth.test.ts`, `worker/test/prod.test.ts` | ✅ |
+| Security headers on worker responses (https only: HSTS, nosniff, Referrer-Policy; HTML + DENY; route values win) | `worker/src/lib/headers.ts`, `worker/src/index.ts` | `worker/test/prod.test.ts` | ✅ |
 | SSR auth pages (Atelier tokens inlined, no JS, strict CSP) | `worker/src/auth/pages.ts` | `worker/test/auth.test.ts` | ✅ |
 | Cookie session + `/api` guard (KV `sess:*`, Sec-Fetch-Site/Origin CSRF) | `worker/src/auth/session.ts`, `worker/src/api/index.ts` | `worker/test/auth.test.ts` | ✅ |
 | Password hash (PBKDF2, WebCrypto) + `auth:hash` script | `worker/src/auth/password.ts`, `worker/scripts/hash-password.mjs`, `worker/.dev.vars.example` | `worker/test/auth.test.ts` | ✅ |
@@ -63,32 +67,35 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | Base styles (grain, themed selection/caret/scrollbar) + Inter @font-face (preloaded via `preloadInter` in vite.config) + Instrument Serif @font-face (not preloaded) | `apps/web/src/styles/base.css`, `apps/web/src/main.tsx` | — | ✅ |
 | Icons (inline SVG paths; stroke style in `base.css` `svg {}`; lazy-only glyphs pass `d` from their own file) | `apps/web/src/components/Icon.tsx` | — | ✅ |
 | Web scaffold (main: QueryClientProvider + startSync + ensureTz) | `apps/web/{index.html,package.json}`, `apps/web/src/{main,App}.tsx` | — | ✅ |
-| Router (History API, `?t=` / `?q=` params; `/search`, `/settings`) + spring mirror | `apps/web/src/lib/{router,springs}.ts` | `apps/web/src/lib/router.test.ts` | ✅ |
-| Web data layer (fetch/ApiError, 401 → `/oauth/login`, QueryClient, keys, queries, optimistic mutations, first-run tz) | `apps/web/src/data/{api,client,keys,queries,mutations,tz}.ts` | — | ✅ |
+| Router (History API, `?t=` / `?q=` params; `/search`, `/settings`; URL changes render in `startTransition`) + spring mirror | `apps/web/src/lib/{router,springs}.ts` | `apps/web/src/lib/router.test.ts` | ✅ |
+| Web data layer (fetch/ApiError, 401 → `/oauth/login`, QueryClient, keys, queries, optimistic mutations, first-run tz) | `apps/web/src/data/{api,client,keys,queries,pages,mutations,tz}.ts` (`pages` = infinite `useTasks`, lazy routes only) | — | ✅ |
 | Delete with Undo (lazy-only: `deleteOptions` shared by editor hook + shortcut) | `apps/web/src/data/remove.ts` | `apps/web/e2e/keys.spec.ts` | ✅ |
 | Cache helpers (pure patchTask/removeTask) | `apps/web/src/data/cache.ts` | `apps/web/src/data/cache.test.ts` | ✅ |
 | Changes poller (visibility-gated, backoff, echo dedupe) | `apps/web/src/data/sync.ts` | `apps/web/src/data/sync.test.ts` | ✅ |
 | Toast store (undo) | `apps/web/src/ui/store.ts` | — | ✅ |
 | Build + chunk naming (entry-/route-/editor-/celebrate-/vendor-motion- via `codeSplitting` group, deps not recursive; facade-less all-celebrate chunks → celebrate-; modulePreload lists CSS only) | `apps/web/vite.config.ts`, `.size-limit.js` | — | ✅ |
 | App shell (layout, sidebar + serif wordmark, tab bar, large→inline title + note line/swash, toast, teacup empty) | `apps/web/src/components/{Shell,Sidebar,TabBar,PageHeader,Toast,Empty}.tsx`, `apps/web/src/styles/shell.css` | `apps/web/e2e/smoke.spec.ts` | ✅ |
-| Task rows (memo list, linger → leave, WAAPI FLIP, checkbox spring/wipe/haptic; `sticky` day headers, `keepDone` for Logbook) | `apps/web/src/components/{TaskList,TaskRow,Checkbox}.tsx`, `apps/web/src/lib/flip.ts`, `apps/web/src/styles/row.css` | `apps/web/e2e/smoke.spec.ts` | ✅ |
-| Quick add (core tokenize chips, dueDate=today on Today; ⌘K / N live in keys/) | `apps/web/src/components/QuickAdd.tsx` | `apps/web/e2e/smoke.spec.ts` | ✅ |
+| Task rows (memo list, linger → leave, recurring ghosts, WAAPI FLIP rows + card height, `@starting-style` enter, ink-stamp checkbox + strike, press wash, editor prefetch on pointerdown; `sticky` day headers, `keepDone` for Logbook, `listId` hides own-list meta) | `apps/web/src/components/{TaskList,TaskRow,Checkbox}.tsx`, `apps/web/src/lib/flip.ts`, `apps/web/src/styles/{row,check}.css` | `apps/web/e2e/smoke.spec.ts` | ✅ |
+| Quick add (core tokenize chips + date/time preview chip mirroring chrono, reserved chip row, dueDate=today on Today; ⌘K / N live in keys/) | `apps/web/src/components/QuickAdd.tsx`, `apps/web/src/lib/when.ts` | `apps/web/src/lib/when.test.ts`, `apps/web/e2e/smoke.spec.ts` | ✅ |
 | Keyboard shortcuts (pure map + one idle-loaded listener; native `<dialog>` help sheet) | `apps/web/src/keys/{map,listen}.ts`, `apps/web/src/styles/views.css` | `apps/web/src/keys/map.test.ts`, `apps/web/e2e/keys.spec.ts` | ✅ |
 | Row/date formatting (Intl) | `apps/web/src/lib/format.ts` | — | ✅ |
-| Route switch + lazy routes + editor slot (`?t=`) + idle prefetch (also celebrate + keys; Settings rides the Lists chunk) | `apps/web/src/App.tsx`, `apps/web/src/lib/prefetch.ts` | — | ✅ |
+| Route switch + lazy routes + editor slot (`?t=`) + idle prefetch (also celebrate + keys; Settings rides the Lists chunk); route rise-in CSS | `apps/web/src/App.tsx`, `apps/web/src/lib/prefetch.ts`, `apps/web/src/styles/route.css` | — | ✅ |
 | Today view (overdue + today, entry chunk) | `apps/web/src/routes/Today.tsx` | `apps/web/e2e/smoke.spec.ts` | ✅ |
 | Upcoming (13 days after today, sticky day headers, empty days collapse) | `apps/web/src/routes/Upcoming.tsx` | `apps/web/e2e/smoke.spec.ts`, shots | ✅ |
 | List/tag view (open tasks, infinite pages) + Search (`/search?q=`, debounced, open + done) + sentinel hook | `apps/web/src/routes/TaskQueryView.tsx`, `apps/web/src/lib/useSentinel.ts`, `apps/web/src/styles/views.css` | `apps/web/e2e/{views,keys,empty}.spec.ts` | ✅ |
-| Lists tab (inset groups: lists, tags, Search, Logbook, Settings) | `apps/web/src/routes/Lists.tsx`, `apps/web/src/styles/shell.css` (`.inset-*`) | `apps/web/e2e/views.spec.ts` | ✅ |
+| Lists tab (inset groups: lists, tags, Search, Logbook, Settings) | `apps/web/src/routes/Lists.tsx`, `apps/web/src/styles/base.css` (`.inset-*`, `.switch`, shared with Settings + editor) | `apps/web/e2e/views.spec.ts` | ✅ |
 | Settings (sound switch, shortcuts, Log out = form POST `/oauth/logout`) | `apps/web/src/routes/Settings.tsx`, `apps/web/src/styles/views.css` | `apps/web/e2e/{settings,celebrate}.spec.ts` | ✅ |
 | Logbook (done, grouped by completion day, uncheck = uncomplete) | `apps/web/src/routes/Logbook.tsx` | `apps/web/e2e/views.spec.ts` | ✅ |
 | Stats (tiles, 26-week heatmap, per-list bars; CSS lazy) | `apps/web/src/routes/{Stats,Heatmap}.tsx`, `apps/web/src/styles/stats.css` | shots | ✅ |
 | Editor sheet (`?t=<id>`, LazyMotion, seeded from cached rows, save-on-close diff PATCH, delete) | `apps/web/src/editor/EditorSheet.tsx`, `apps/web/src/data/queries.ts` (`useTask` seed) | `apps/web/e2e/smoke.spec.ts` | ✅ |
 | Sheet (bottom/centered, springs, drag-dismiss, focus trap, Esc, scrim) + pickers (dates, repeat, tags) | `apps/web/src/editor/{Sheet,DateFields,RepeatPicker,TagInput}.tsx`, `apps/web/src/styles/sheet.css`, `apps/web/src/styles/tokens.css` (`--scrim`, `--sheet-*`, `--grabber-*`) | `apps/web/e2e/smoke.spec.ts`, shots | ✅ |
-| Completion celebration (pure `decide`: burst / Today's done / streak milestones; pooled canvas, rAF only while alive; CSS card; WebAudio chime, off by default; reduced-motion fade) — triggered from `useComplete` | `apps/web/src/celebrate/{decide,particles,sound,run}.ts`, `apps/web/src/styles/celebrate.css` | `apps/web/src/celebrate/{decide,particles}.test.ts`, `apps/web/e2e/celebrate.spec.ts` | ✅ |
-| Empty states (Atelier copy per view; inline SVG/CSS only) | `apps/web/src/components/Empty.tsx`, `apps/web/src/routes/*` | `apps/web/e2e/empty.spec.ts` | ✅ |
+| Completion feedback (pure `decide`: Today's done / streak milestones; routine tick = CSS ink stamp only; milestone = burst + toast line; "Today's done" teacup moment CSS; pooled canvas, rAF only while alive; WebAudio chime, off by default) — triggered from `useComplete` | `apps/web/src/celebrate/{decide,particles,sound,run}.ts`, `apps/web/src/styles/celebrate.css` | `apps/web/src/celebrate/{decide,particles}.test.ts`, `apps/web/e2e/celebrate.spec.ts` | ✅ |
+| Empty states (Atelier copy per view; `onRetry` error variant; `moment` = Today's done; inline SVG/CSS only) | `apps/web/src/components/Empty.tsx`, `apps/web/src/routes/*` | `apps/web/e2e/empty.spec.ts` | ✅ |
 | Accessibility (contrast of every token pair, axe on every view light/dark, 44pt targets, focus return) | `apps/web/src/styles/tokens.css`, `apps/web/src/editor/Sheet.tsx` | `apps/web/src/styles/contrast.test.ts`, `apps/web/e2e/a11y.spec.ts` | ✅ |
-| PWA manifest + SW (precache shell · CacheFirst `/assets` · NetworkFirst `/api` GET · nav denylist api/mcp/oauth/authorize/token/.well-known) · dev proxy of worker paths | `apps/web/vite.config.ts`, `apps/web/index.html` (metas), `apps/web/public/icons/*` | `apps/web/e2e/pwa.spec.ts` (`pwa` project: built app on :8787, SW allowed) | ✅ |
+| PWA manifest + SW (precache shell · CacheFirst `/assets` · NetworkFirst `/api` GET · nav denylist api/mcp/oauth/authorize/token/.well-known · `clientsClaim`) · dev proxy of worker paths | `apps/web/vite.config.ts`, `apps/web/index.html` (metas), `apps/web/public/icons/*` | `apps/web/e2e/pwa.spec.ts` (`pwa` project: built app on :8787, SW allowed) | ✅ |
+| Static security headers + CSP (`securityHeaders()` plugin → `dist/_headers`, sha256 of inline SW registration) · `.vite/` not served | `apps/web/vite.config.ts`, `apps/web/public/.assetsignore` | `apps/web/e2e/prod/pwa.spec.ts` | ✅ |
+| PWA on the deployed origin, logged out (first visit SW-controlled, offline SPA, denylist = never `#root`; `/api` passes through SW, headers) | `apps/web/e2e/prod/{prod.config,pwa.spec}.ts` | `PWA_URL=<ORIGIN> npm run test:prod -w @motion/web` | ✅ |
+| Logout clears SW `api` cache before the form POST | `apps/web/src/routes/Settings.tsx` | — | ✅ |
 | E2E smoke + screenshots + auth (setup project logs in → storageState; isolated D1 `worker/.wrangler/e2e`, wrangler :8787 + vite :5173, phone/desktop, SW blocked; shots → `e2e/shots/` gitignored) | `apps/web/playwright.config.ts`, `apps/web/e2e/{auth.setup,auth.spec,auth}.ts`, `apps/web/e2e/{seed,smoke.spec,shots.spec}.ts` (seed: `clearToday`, `keysReady`), `apps/web/e2e/tsconfig.json` | `npm run test:e2e -w @motion/web` | ✅ |
 
 ## #sched / #recur

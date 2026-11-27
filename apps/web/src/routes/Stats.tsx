@@ -12,18 +12,17 @@ function Tile({ label, value, hint }: { label: string; value: number; hint?: str
   return (
     <div className="tile">
       <span className="tile-label t-eyebrow">{label}</span>
-      <span className="tile-value">{value}</span>
+      <span className="tile-value t-numeral">{value}</span>
       {hint && <span className="tile-hint t-caption1 mono">{hint}</span>}
     </div>
   );
 }
 
 export default function Stats() {
-  const { data: s, isError } = useStats(182);
+  const { data: s, isError, refetch } = useStats(182);
   const { data: lists } = useLists();
   const today = localToday();
-  if (isError)
-    return <Empty icon="close" title="Couldn’t load stats" hint="Check your connection — it’ll retry." />;
+  if (isError) return <Empty title="The ledger didn’t come through." onRetry={() => void refetch()} />;
 
   const week = Array.from({ length: 7 }, (_, i) => s?.perDay[addDays(today, -i)] ?? 0).reduce(
     (a, b) => a + b,

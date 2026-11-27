@@ -1,10 +1,12 @@
 // #list #task #ui per-list (/list/:id), per-tag (/tag/:name) open tasks, and Search (/search?q=, open + done),
 // paginated via one sentinel. One lazy chunk: search shares the list machinery instead of duplicating it.
-import { useEffect, useState } from 'react';
+import type { Task } from '@motion/core/schemas';
+import { useEffect, useRef, useState } from 'react';
 import { Empty } from '../components/Empty';
 import { PageHeader } from '../components/PageHeader';
 import { TaskList } from '../components/TaskList';
-import { useLists, useTasks } from '../data/queries';
+import { useTasks } from '../data/pages';
+import { useLists } from '../data/queries';
 import { setParam } from '../lib/router';
 import { useSentinel } from '../lib/useSentinel';
 import '../styles/views.css';
@@ -49,6 +51,12 @@ export default function TaskQueryView({ list, tag, search }: Props) {
   const tasks = r.data?.pages.flatMap((p) => p.items) ?? [];
   const name = lists?.find((l) => l.id === list)?.name;
   const title = isSearch ? 'Search' : tag ? `@${tag}` : (name ?? 'List');
+  // Search: open rows first, then a Done group. Each row keeps the group it was first seen in,
+  // so a tick strikes in place instead of jumping groups (same idea as Logbook's pinned day).
+  const pins = useRef({ q, m: new Map<string, boolean>() });
+  if (pins.current.q !== q) pins.current = { q, m: new Map() };
+  const m = pins.current.m;
+  const isDone = (t: Task) => m.get(t.id) ?? (m.set(t.id, t.done), t.done);
 
   return (
     <>
@@ -61,10 +69,17 @@ export default function TaskQueryView({ list, tag, search }: Props) {
           hint="Titles and notes are searched, done ones too."
         />
       ) : r.isError ? (
-        <Empty icon="close" title="Couldn’t load tasks" hint="Check your connection — it’ll retry." />
+        <Empty title="These tasks didn’t load." onRetry={r.refetch} />
       ) : (
         <>
-          <TaskList tasks={tasks} keepDone={isSearch} />
+          {isSearch ? (
+            <>
+              <TaskList tasks={tasks.filter((t) => !isDone(t))} keepDone />
+              <TaskList tasks={tasks.filter(isDone)} title="Done" keepDone />
+            </>
+          ) : (
+            <TaskList tasks={tasks} listId={list} />
+          )}
           {r.isSuccess &&
             !tasks.some((t) => isSearch || !t.done) &&
             (isSearch ? (

@@ -1,8 +1,9 @@
 // #ui #anim modal sheet (motion, editor chunk only): bottom sheet on phone, centered ≥768px.
-// Enter/exit springs, drag-to-dismiss (pointer events → spring motion value), focus trap, Esc, backdrop tap.
-import { AnimatePresence, m, useReducedMotion, useSpring } from 'motion/react';
-import { type KeyboardEvent, type PointerEvent, type ReactNode, useEffect, useRef } from 'react';
-import { springs } from '../lib/springs';
+// Enter spring / exit ease-in tween (tokens --overlay-in/-out/-pop), drag-to-dismiss with release velocity,
+// focus trap, Esc, backdrop tap. Layout (phone vs centered) follows matchMedia live.
+import { AnimatePresence, m, useAnimationControls, useMotionValue, useReducedMotion } from 'motion/react';
+import { type KeyboardEvent, type PointerEvent, type ReactNode, useEffect, useRef, useState } from 'react';
+import { dur, overlayOut, overlayScale, springs } from '../lib/springs';
 
 type Props = {
   open: boolean;
@@ -14,7 +15,7 @@ type Props = {
   children: ReactNode;
 };
 
-const { type: _t, ...dragSpring } = springs.smooth;
+const WIDE = '(min-width: 768px)';
 const DISMISS_PX = 120;
 const DISMISS_V = 0.6; // px/ms
 const FOCUSABLE =
@@ -22,10 +23,21 @@ const FOCUSABLE =
 
 export function Sheet({ open, label, onRequestClose, onExited, bar, children }: Props) {
   const reduced = useReducedMotion();
-  const wide = useRef(matchMedia('(min-width: 768px)').matches).current;
+  const [wide, setWide] = useState(() => matchMedia(WIDE).matches);
   const ref = useRef<HTMLDivElement>(null);
-  const dragY = useSpring(0, dragSpring);
+  const dragY = useMotionValue(0);
+  const settle = useAnimationControls(); // drives dragY (bound via style) with release velocity
   const drag = useRef<{ y0: number; y: number; t: number; v: number } | null>(null);
+
+  useEffect(() => {
+    const mq = matchMedia(WIDE);
+    const on = () => {
+      setWide(mq.matches);
+      dragY.jump(0);
+    };
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, [dragY]);
 
   // focus in on open, restore on unmount
   useEffect(() => {
@@ -78,13 +90,25 @@ export function Sheet({ open, label, onRequestClose, onExited, bar, children }: 
     const d = drag.current;
     drag.current = null;
     if (!d) return;
-    if (d.y > DISMISS_PX || d.v > DISMISS_V) onRequestClose();
-    else dragY.set(0);
+    const velocity = d.v * 1000; // px/ms → px/s
+    const flung = d.y > DISMISS_PX || d.v > DISMISS_V;
+    // flung: dragY keeps falling with the release velocity while the 200ms exit tween takes over.
+    // reduced: the exit is a fade in place.
+    const to = flung && !reduced ? (ref.current?.offsetHeight ?? 0) + d.y : 0;
+    if (reduced) dragY.jump(0);
+    else
+      void settle.start({ y: to, transition: { ...(flung ? springs.overlayIn : springs.smooth), velocity } });
+    if (flung) onRequestClose();
   };
 
-  const hidden = reduced ? { opacity: 0 } : wide ? { opacity: 0, scale: 0.94 } : { y: '100%' };
+  const hidden = reduced ? { opacity: 0 } : wide ? { opacity: 0, scale: overlayScale } : { y: '100%' };
   const shown = reduced ? { opacity: 1 } : wide ? { opacity: 1, scale: 1 } : { y: 0 };
-  const transition = reduced ? { duration: 0.15 } : springs.smooth;
+  const fade = { duration: dur.fade };
+  const enter = reduced ? fade : wide ? springs.overlayPop : springs.overlayIn;
+  const exit = reduced ? fade : overlayOut;
+  // scrim tracks the sheet's duration, linear opacity
+  const scrimIn = { duration: reduced ? dur.fade : wide ? dur.pop : dur.overlayIn, ease: 'linear' } as const;
+  const scrimOut = { duration: reduced ? dur.fade : dur.overlayOut, ease: 'linear' } as const;
 
   return (
     <AnimatePresence onExitComplete={onExited}>
@@ -93,9 +117,8 @@ export function Sheet({ open, label, onRequestClose, onExited, bar, children }: 
           key="scrim"
           className="sheet-scrim"
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          animate={{ opacity: 1, transition: scrimIn }}
+          exit={{ opacity: 0, transition: scrimOut }}
           onClick={onRequestClose}
         />
       )}
@@ -104,9 +127,8 @@ export function Sheet({ open, label, onRequestClose, onExited, bar, children }: 
           key="sheet"
           className="sheet-pos"
           initial={hidden}
-          animate={shown}
-          exit={hidden}
-          transition={transition}
+          animate={{ ...shown, transition: enter }}
+          exit={{ ...hidden, transition: exit }}
         >
           <m.div
             ref={ref}
@@ -116,6 +138,7 @@ export function Sheet({ open, label, onRequestClose, onExited, bar, children }: 
             aria-label={label}
             tabIndex={-1}
             style={{ y: dragY }}
+            animate={settle}
             onKeyDown={onKeyDown}
           >
             <div

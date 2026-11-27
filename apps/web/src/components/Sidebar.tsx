@@ -32,7 +32,7 @@ export function Sidebar({ route }: { route: Route }) {
       </ul>
       {!!lists?.length && (
         <ul className="side-group" aria-label="Lists">
-          <li className="side-heading t-footnote">Lists</li>
+          <li className="side-heading t-title3">Lists</li>
           {lists.map((l) => (
             <li key={l.id}>
               <Link
@@ -49,7 +49,7 @@ export function Sidebar({ route }: { route: Route }) {
       )}
       {!!tags?.length && (
         <ul className="side-group" aria-label="Tags">
-          <li className="side-heading t-footnote">Tags</li>
+          <li className="side-heading t-title3">Tags</li>
           {tags.map((g) => (
             <li key={g.id}>
               <Link

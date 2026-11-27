@@ -44,7 +44,7 @@ describe('owner login + session', () => {
     expect(ok.status).toBe(303);
     expect(ok.headers.get('location')).toBe('/');
     expect(ok.headers.get('set-cookie')).toMatch(/^sid=.+HttpOnly.*SameSite=Lax/i);
-    await env.OAUTH_KV.delete('rl:local');
+    await Promise.all(['rl:local', 'rl:*'].map((k) => env.OAUTH_KV.delete(k)));
   });
 
   it('/api: no cookie → 401, session → 200, cross-origin write → 403, logout → 401', async () => {
@@ -70,7 +70,7 @@ describe('owner login + session', () => {
   it('rate-limits after 5 failures', async () => {
     for (let i = 0; i < 5; i++) expect((await login('bad')).status).toBe(403);
     expect((await login()).status).toBe(429);
-    await env.OAUTH_KV.delete('rl:local');
+    await Promise.all(['rl:local', 'rl:*'].map((k) => env.OAUTH_KV.delete(k)));
     expect((await login()).status).toBe(303);
   });
 });

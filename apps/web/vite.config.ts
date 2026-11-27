@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { readFileSync, writeFileSync } from 'node:fs';
 import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -18,6 +19,45 @@ const preloadInter = (): Plugin => ({
           },
         ]
       : [];
+  },
+});
+
+// #deploy `dist/_headers` (Workers static assets): security headers + CSP with sha256 of each inline
+// script (vite-plugin-pwa's inline SW registration) — written after every other plugin touched index.html.
+const securityHeaders = (): Plugin => ({
+  name: 'security-headers',
+  apply: 'build',
+  enforce: 'post',
+  closeBundle() {
+    const html = readFileSync('dist/index.html', 'utf8');
+    const hashes = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)].map(
+      (m) =>
+        `'sha256-${createHash('sha256')
+          .update(m[1] ?? '')
+          .digest('base64')}'`,
+    );
+    const csp = [
+      "default-src 'self'",
+      `script-src 'self' ${hashes.join(' ')}`.trim(),
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data:",
+      "object-src 'none'",
+      "frame-ancestors 'none'",
+      "base-uri 'none'",
+      "form-action 'self'",
+    ].join('; ');
+    // Referrer-Policy must keep same-origin Referer: login derives `next` from it.
+    const headers = `/*
+  Strict-Transport-Security: max-age=31536000
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Content-Security-Policy: ${csp}
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+`;
+    writeFileSync('dist/_headers', headers);
+    console.log(`security-headers: ${hashes.length} inline script hash(es)`);
   },
 });
 
@@ -79,6 +119,8 @@ const pwa = VitePWA({
     // worker-owned paths (REST, MCP, OAuth + SSR login/consent) must never get the SPA shell
     navigateFallbackDenylist: [/^\/(api|mcp|oauth|authorize|token|\.well-known)(\/|$)/],
     cleanupOutdatedCaches: true,
+    // control the first visit too, so /api is cached before the first reload (offline right after install)
+    clientsClaim: true,
     runtimeCaching: [
       {
         urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/assets/'),
@@ -105,14 +147,19 @@ const pwa = VitePWA({
 });
 
 export default defineConfig({
-  plugins: [react(), preloadInter(), pwa],
+  plugins: [react(), preloadInter(), pwa, securityHeaders()],
   server: { proxy: { '^/(api|mcp|oauth|authorize|token|\\.well-known)(/|$)': 'http://localhost:8787' } },
   build: {
     target: 'es2022',
     manifest: true,
     // #perf JS deps of lazy chunks load on demand (idle prefetch warms them); only CSS stays in the
     // preload lists so code-split CSS still arrives with its chunk. Cuts per-import dep arrays from entry.
-    modulePreload: { resolveDependencies: (_f, deps) => deps.filter((d) => d.endsWith('.css')) },
+    // No modulepreload polyfill (−240 B initial): every es2022 target supports it natively, and where it
+    // doesn't the hint is just ignored.
+    modulePreload: {
+      polyfill: false,
+      resolveDependencies: (_f, deps) => deps.filter((d) => d.endsWith('.css')),
+    },
     rollupOptions: {
       output: {
         entryFileNames: 'assets/entry-[hash].js',

@@ -1,11 +1,13 @@
 // #ui route switch (Today eager, others lazy) + editor slot for ?t=<id> (Back closes it).
+// Route changes are transitions (lib/router): the old view stays until the lazy one is ready, then rises in (route.css).
 import { lazy, Suspense } from 'react';
 import { Empty } from './components/Empty';
 import { QuickAdd } from './components/QuickAdd';
 import { Shell } from './components/Shell';
 import { loaders } from './lib/prefetch';
-import { type Route, setParam, useRoute } from './lib/router';
+import { navigate, type Route, setParam, useRoute } from './lib/router';
 import Today from './routes/Today';
+import './styles/route.css';
 
 const Upcoming = lazy(loaders.upcoming);
 const TaskQueryView = lazy(loaders.query);
@@ -36,7 +38,14 @@ function View({ route, q }: { route: Route; q: string }) {
     case 'settings':
       return <Settings />;
     default:
-      return <Empty icon="close" title="Page not found" />;
+      return (
+        <Empty
+          icon="search"
+          title="Nothing on this page."
+          hint="The link may be old."
+          action={{ label: 'Go to Today', run: () => navigate('/') }}
+        />
+      );
   }
 }
 

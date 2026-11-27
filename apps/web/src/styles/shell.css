@@ -82,11 +82,12 @@
   max-width: 48ch;
   text-wrap: pretty;
 }
-.page-title::after {
+/* the swash is earned, not stamped: only a header that opts in (Today) carries it */
+.page-title[data-swash]::after {
   content: "";
   display: block;
-  width: 140px;
-  height: 12px;
+  width: var(--swash-w);
+  height: var(--swash-h);
   margin-top: var(--s-1);
   background: var(--tint);
   -webkit-mask: var(--swash) no-repeat center / 100% 100%;
@@ -120,20 +121,16 @@
   color: var(--label2);
   transition: transform var(--spring-snappy);
 }
+/* current tab: clay ink + semibold label (a second cue besides color; no dot to collide with the label) */
 .tab[aria-current="page"] {
   color: var(--tint-ink);
 }
-.tab[aria-current="page"]::after {
-  content: "";
-  position: absolute;
-  bottom: 3px;
-  width: 4px;
-  height: 4px;
-  border-radius: var(--r-pill);
-  background: var(--tint);
+.tab[aria-current="page"] > span {
+  font-weight: var(--t-headline-wt);
 }
 .tab:active {
   transform: scale(var(--press-scale));
+  transition: transform var(--press);
 }
 
 /* ── Sidebar (desktop) ── */
@@ -169,7 +166,8 @@
     display: inline-block;
     margin: 0 var(--s-3) var(--s-4);
     padding-inline-end: var(--s-3);
-    font: var(--t-title1-size) / var(--t-title1-lh) var(--font-serif);
+    font: var(--t-title1-wt) var(--t-title1-size) / var(--t-title1-lh) var(--font-serif);
+    letter-spacing: var(--t-title1-ls);
     color: var(--label);
     background:
       radial-gradient(circle, var(--tint) 2.5px, transparent 3px) no-repeat right 0 bottom 0.32em / var(--s-2)
@@ -180,10 +178,10 @@
 .side-group {
   margin-bottom: var(--s-5);
 }
+/* type comes from .t-title3 (serif section heading, same role as page sections) */
 .side-heading {
-  padding: var(--s-4) var(--s-3) var(--s-1);
+  padding: var(--s-3) var(--s-3) var(--s-1);
   color: var(--label2);
-  font: var(--t-title3-wt) var(--t-headline-size) / var(--t-headline-lh) var(--font-serif);
 }
 .side-item {
   min-height: var(--tap);
@@ -238,6 +236,11 @@
   background: var(--bg-grouped2);
   box-shadow: var(--shadow-card);
 }
+/* the ring belongs to the whole composer: the input is borderless and clipped inside the pill */
+.quick-add:focus-within {
+  outline: var(--focus-w) solid var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
 .quick-add-icon {
   width: 32px;
   height: 32px;
@@ -259,12 +262,14 @@
   min-height: var(--tap);
   background: none;
   border: 0;
-  outline: 0;
   color: var(--label);
   text-overflow: ellipsis;
 }
+.quick-add-input:focus-visible {
+  outline: 0;
+}
 .quick-add-input::placeholder {
-  color: var(--label3);
+  color: var(--placeholder);
 }
 .quick-add-kbd {
   color: var(--label2);
@@ -275,18 +280,40 @@
     display: none;
   }
 }
+/* chip row: reserved one line tall while composing (focused or non-empty), so chips appearing
+   never resize the composer; scrolls sideways instead of wrapping */
 .chips {
-  display: flex;
-  flex-wrap: wrap;
+  display: none;
+  height: var(--chip-row);
+  margin-bottom: var(--s-2);
   gap: var(--s-1);
-  padding-bottom: var(--s-2);
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* overflowing chips fade out at the trailing edge instead of being sliced */
+  mask-image: linear-gradient(to left, transparent, black var(--s-6));
+}
+.quick-add:focus-within .chips,
+.quick-add:has(.quick-add-input:not(:placeholder-shown)) .chips {
+  display: flex;
+}
+.chips-hint {
+  color: var(--placeholder);
+  white-space: nowrap;
 }
 .chip {
-  padding: 0 var(--s-2);
+  flex: none;
+  padding-inline: var(--chip-pad);
   border-radius: var(--r-pill);
-  background: color-mix(in srgb, var(--tint) 12%, transparent);
-  color: var(--tint-ink);
-  animation: pop var(--spring-bouncy);
+  background: var(--chip-bg);
+  color: var(--chip-ink);
+  white-space: nowrap;
+  animation: chip-in var(--chip-in);
+}
+.chip-when {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
 }
 
 /* ── Toast ── */
@@ -305,20 +332,22 @@
   align-items: center;
   gap: var(--s-2);
   border-radius: var(--r-pill);
-  background: light-dark(#2b2520, #efe4d2);
-  color: light-dark(#f6ede0, #2b2520);
+  background: var(--toast-bg);
+  color: var(--toast-label);
   box-shadow: var(--shadow-card);
   pointer-events: auto;
-  animation:
-    toast-in var(--spring-bouncy),
-    fade-in var(--fade);
+  animation: toast-in var(--toast-in);
+}
+.toast-out {
+  pointer-events: none;
+  animation: toast-out var(--toast-out) forwards;
 }
 .toast:not(:has(.toast-action)) {
   min-height: var(--tap);
   padding-inline-end: var(--s-4);
 }
 .toast-action {
-  color: var(--tint-ink);
+  color: var(--toast-action);
 }
 
 /* ── Empty ── */
@@ -364,48 +393,24 @@
 }
 @keyframes toast-in {
   from {
-    transform: translateY(var(--s-4)) scale(var(--leave-scale));
+    opacity: 0;
+    transform: translateY(var(--toast-rise));
   }
 }
-@keyframes pop {
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(var(--toast-drop));
+  }
+}
+@keyframes chip-in {
   from {
-    transform: scale(var(--leave-scale));
+    transform: scale(var(--chip-from));
     opacity: 0;
   }
 }
 
-/* ── Inset grouped list (Lists tab) ── */
-.inset-group {
-  margin: 0 var(--s-4) var(--s-6);
-  border-radius: var(--r-group);
-  background: var(--bg-grouped2);
-  overflow: hidden;
-}
-.inset-item {
-  position: relative;
-  min-height: var(--tap);
-  padding-inline: var(--s-4) var(--s-3);
-  display: flex;
-  align-items: center;
-  gap: var(--s-3);
-  color: var(--label);
-}
-.inset-item:active {
-  background: var(--fill4);
-}
-li + li > .inset-item::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto calc(var(--s-4) + var(--tap) - var(--s-3));
-  border-top: var(--hairline) solid var(--separator);
-}
-.inset-label {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+/* ── Inset rows: Lists-tab accents (group + row live in base.css) ── */
 .inset-icon {
   color: var(--tint);
 }

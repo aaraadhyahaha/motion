@@ -1,10 +1,12 @@
-// #ui ~40-line History-API router on useSyncExternalStore (no dependency; plan §0).
+// #ui ~40-line History-API router; URL changes render in startTransition (no dependency; plan §0).
 import {
   type AnchorHTMLAttributes,
   createElement,
   type MouseEvent,
+  startTransition,
+  useEffect,
   useMemo,
-  useSyncExternalStore,
+  useState,
 } from 'react';
 
 export type Route =
@@ -63,8 +65,15 @@ export function navigate(to: string, opts: { replace?: boolean } = {}) {
 export const setParam = (key: string, value: string | null, replace?: boolean) =>
   navigate(withParam(snap(), key, value), { replace });
 
+/** URL changes render as a transition (not useSyncExternalStore, which can't): a lazy route that suspends
+ * keeps the current view on screen instead of flashing the blank Suspense fallback. */
 export function useRoute(): { route: Route; params: URLSearchParams } {
-  const s = useSyncExternalStore(subscribe, snap, () => '/');
+  const [s, set] = useState(snap);
+  useEffect(() => {
+    const sync = () => startTransition(() => set(snap()));
+    sync(); // a change between first render and subscribe
+    return subscribe(sync);
+  }, []);
   return useMemo(() => {
     const i = s.indexOf('?');
     return {

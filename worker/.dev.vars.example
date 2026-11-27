@@ -1,2 +1,4 @@
 # Copy to worker/.dev.vars (gitignored). Generate with: npm run auth:hash -w @motion/worker
 OWNER_PW_HASH=pbkdf2.100000.REPLACE.REPLACE
+# MCP Inspector (local only; prod allows claude.ai + claude.com)
+OAUTH_REDIRECT_ALLOW=https://claude.ai,https://claude.com,http://localhost:6274

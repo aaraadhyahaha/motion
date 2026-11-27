@@ -2,9 +2,10 @@
 // One IntersectionObserver on the large title — no scroll listeners.
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 
-type Props = { title: string; subtitle?: string; actions?: ReactNode };
+/** `swash`: the hand-drawn clay underline — Today only, so it stays a signature, not a stamp. */
+type Props = { title: string; subtitle?: string; actions?: ReactNode; swash?: boolean };
 
-export function PageHeader({ title, subtitle, actions }: Props) {
+export function PageHeader({ title, subtitle, actions, swash }: Props) {
   const bar = useRef<HTMLDivElement>(null);
   const big = useRef<HTMLHeadingElement>(null);
   const [stuck, setStuck] = useState(false);
@@ -28,7 +29,7 @@ export function PageHeader({ title, subtitle, actions }: Props) {
         </span>
         {actions && <div className="nav-bar-actions">{actions}</div>}
       </div>
-      <h1 className="page-title t-large-title" ref={big}>
+      <h1 className="page-title t-large-title" ref={big} data-swash={swash || undefined}>
         {title}
       </h1>
       {subtitle && <p className="page-subtitle t-subhead">{subtitle}</p>}

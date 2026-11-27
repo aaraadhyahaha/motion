@@ -13,7 +13,12 @@ export default defineProject(async () => {
       cloudflareTest({
         wrangler: { configPath: './wrangler.jsonc' },
         miniflare: {
-          bindings: { TEST_MIGRATIONS: migrations, OWNER_PW_HASH: hash(TEST_PW, Buffer.alloc(16, 1), 1000) },
+          bindings: {
+            TEST_MIGRATIONS: migrations,
+            OWNER_PW_HASH: hash(TEST_PW, Buffer.alloc(16, 1), 1000),
+            // test/oauth.ts REDIRECT (Inspector origin) — not allowed in prod vars
+            OAUTH_REDIRECT_ALLOW: 'https://claude.ai,https://claude.com,http://localhost:6274',
+          },
         },
       }),
     ],

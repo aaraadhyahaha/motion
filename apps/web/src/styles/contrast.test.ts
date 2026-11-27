@@ -56,6 +56,8 @@ const PAIRS: [string, string[], number][] = [
   ['--label', [...TEXT, ...BARS], 4.5],
   ['--label2', [...TEXT, ...BARS], 4.5], // secondary text, hints, kbd, done rows
   ['--tint-ink', [...TEXT, ...BARS], 4.5], // small tinted text
+  ['--placeholder', [...TEXT, ...BARS], 4.5], // instructional hints: quick add, tags, search
+  ['--focus-ring', [...TEXT, ...BARS], 3], // keyboard ring (outline, sits on the surrounding surface)
   ['--tint', [...TEXT, ...BARS], 3], // glyphs only (icons, checkbox fill); tinted text uses --tint-ink
   ['--red', TEXT, 4.5], // overdue dates, Log out
   ['--on-tint', ['--tint'], 4.5], // filled button label
@@ -80,6 +82,15 @@ describe('contrast (tokens.css)', () => {
     for (const bg of TEXT)
       expect(ratio(ring, over(color(bg, mode), color('--bg', mode)))).toBeGreaterThanOrEqual(3);
   });
+  it.each([0, 1] as const)(
+    'placeholder ≥ 4.5 inside --fill3 fields (search) on every surface, mode %i',
+    (mode) => {
+      for (const bg of TEXT) {
+        const field = over(color('--fill3', mode), over(color(bg, mode), color('--bg', mode)));
+        expect(ratio(color('--placeholder', mode), field)).toBeGreaterThanOrEqual(4.5);
+      }
+    },
+  );
   for (const [mode, name] of [
     [0, 'light'],
     [1, 'dark'],
@@ -92,4 +103,14 @@ describe('contrast (tokens.css)', () => {
           expect(ratio(color(fg, mode), surface)).toBeGreaterThanOrEqual(min);
         });
   }
+});
+
+// Agent 2: toast (inverted surface) — message + Undo action ≥ 4.5 on --toast-bg, light + dark.
+describe('contrast: toast', () => {
+  for (const mode of [0, 1] as const)
+    for (const fg of ['--toast-label', '--toast-action'])
+      it(`${mode ? 'dark' : 'light'} ${fg} on --toast-bg ≥ 4.5`, () => {
+        // light 13.24 / 7.55 · dark 13.27 / 5.46
+        expect(ratio(color(fg, mode), color('--toast-bg', mode))).toBeGreaterThanOrEqual(4.5);
+      });
 });

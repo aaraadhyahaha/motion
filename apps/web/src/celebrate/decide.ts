@@ -26,10 +26,5 @@ export function decide(f: Facts): Moment {
   return { todayDone, milestone: MILESTONES.includes(next) ? next : 0 };
 }
 
-/** Card lines for a big moment (empty → just a burst). */
-export function lines(m: Moment): string[] {
-  const out: string[] = [];
-  if (m.todayDone) out.push('Today’s done.');
-  if (m.milestone) out.push(`${m.milestone}-day streak.`);
-  return out;
-}
+/** Toast line for a streak milestone ('' → none). "Today's done" lives in the teacup (components/Empty). */
+export const note = (m: Moment) => (m.milestone ? `${m.milestone}-day streak. Nicely kept.` : '');

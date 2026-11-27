@@ -1,0 +1,93 @@
+/* #ui #anim round checkbox (ink stamp: fill + ring bloom) + reduced-motion cross-fade for fill and strike. Tokens only. */
+/* ── Checkbox: 44px hit area around a 22px ring ── */
+.check {
+  width: calc(var(--tap) + var(--s-1));
+  min-height: var(--tap);
+  flex: none;
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+  padding-inline-start: var(--s-1);
+}
+.check-ring {
+  position: relative;
+  width: var(--check-size);
+  height: var(--check-size);
+  border-radius: var(--r-pill);
+  box-shadow: inset 0 0 0 var(--check-stroke) color-mix(in srgb, var(--label3) 45%, var(--tint)); /* ≥ 3:1 UI boundary (contrast.test) */
+  transition: transform var(--spring-snappy);
+}
+.check:active .check-ring {
+  transform: scale(var(--press-scale));
+}
+.check-fill {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: clip;
+  border-radius: inherit;
+  background: var(--tint);
+  color: var(--on-tint);
+  transform: scale(0) rotate(-8deg);
+  transition: transform var(--dur-fade) var(--ease-in);
+}
+.check-fill > svg {
+  stroke-width: 3;
+}
+/* tint-colored cover slides off left→right: reads as the stroke being drawn (transform only) */
+.check-wipe {
+  position: absolute;
+  inset: 0;
+  background: var(--tint);
+  transform-origin: right;
+  transition: transform var(--check-fill);
+}
+.check[aria-checked="true"] .check-fill {
+  transform: scale(1) rotate(-8deg);
+  transition: transform var(--check-fill);
+}
+/* clay ring blooms once on check (no loop) */
+.check-ring::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px var(--tint);
+  opacity: 0;
+  pointer-events: none;
+}
+.check[aria-checked="true"] .check-ring::after {
+  animation: stamp-bloom var(--dur-bouncy) var(--ease-out) 1 both;
+}
+@keyframes stamp-bloom {
+  from {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+.check[aria-checked="true"] .check-wipe {
+  transform: scaleX(0);
+  transition-delay: calc(var(--dur-check) / 3);
+}
+
+/* reduced motion: fill + strike cross-fade (no scale, no draw) */
+@media (prefers-reduced-motion: reduce) {
+  .check-fill,
+  .task-list .row-title::after {
+    transform: none;
+    opacity: 0;
+    transition: opacity var(--fade);
+  }
+  .check[aria-checked="true"] .check-fill,
+  .task-list .row[data-done] .row-title::after {
+    opacity: 1;
+  }
+  .check-wipe {
+    display: none;
+  }
+}

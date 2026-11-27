@@ -1,5 +1,6 @@
-// #ui #anim round checkbox: CSS spring fill + wipe-reveal check (transform only) (haptic lives in celebrate/run).
+// #ui #anim round checkbox: ink stamp — CSS spring fill + wipe-reveal check + ring bloom (haptic lives in celebrate/run).
 import { Icon } from './Icon';
+import '../styles/check.css';
 
 type Props = { checked: boolean; onChange: (next: boolean) => void; label: string };
 

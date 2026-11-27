@@ -7,11 +7,11 @@ import { useAgenda } from '../data/queries';
 import { fmtDay, fmtDayLong, localToday } from '../lib/format';
 
 export default function Upcoming() {
-  const { data, isPending, isError } = useAgenda(14);
+  const { data, isPending, isError, refetch } = useAgenda(14);
   const today = data?.today ?? localToday();
   const days = Array.from({ length: 13 }, (_, i) => addDays(today, i + 1)).map((day) => ({
     day,
-    // rolled-forward recurring tasks keep their old slot until the agenda refetches
+    // rolled-forward recurring tasks leave their old slot; TaskList lingers a done snapshot (ghost) first
     tasks: data?.days[day]?.filter((t) => !t.dueDate || t.dueDate === day) ?? [],
   }));
   const any = days.some((d) => d.tasks.some((t) => !t.done));
@@ -23,7 +23,7 @@ export default function Upcoming() {
         subtitle={`${fmtDay(addDays(today, 1))} – ${fmtDay(addDays(today, 13))}`}
       />
       {isError ? (
-        <Empty icon="close" title="Couldn’t load Upcoming" hint="Check your connection — it’ll retry." />
+        <Empty title="Upcoming didn’t load." onRetry={refetch} />
       ) : (
         <>
           {days.map(({ day, tasks }, i) => (

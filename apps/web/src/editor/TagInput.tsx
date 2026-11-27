@@ -30,8 +30,8 @@ export function TagInput({ tags, onChange }: Props) {
   return (
     <div className="ed-group">
       <div className="inset-group">
-        <div className="ed-row ed-tags">
-          <Icon name="tag" className="ed-icon" />
+        <div className="inset-item ed-tags">
+          <Icon name="tag" className="inset-lead" />
           {tags.map((t) => (
             <button
               key={t}

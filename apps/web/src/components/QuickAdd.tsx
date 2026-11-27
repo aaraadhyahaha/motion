@@ -1,4 +1,5 @@
-// #task #sched quick add: live chips from core tokenize, Enter → POST /api/tasks/quick. ⌘K / N live in keys/map.
+// #task #sched quick add: live chips (date preview from lib/when + core tokenize), Enter → POST /api/tasks/quick.
+// ⌘K / N live in keys/map.
 
 import { tokenize } from '@motion/core/quickadd';
 import { describe, parseRule } from '@motion/core/recurrence';
@@ -8,11 +9,15 @@ import { useMemo, useState } from 'react';
 import { keys } from '../data/keys';
 import { useQuickAdd } from '../data/mutations';
 import { localToday } from '../lib/format';
+import { previewWhen } from '../lib/when';
 import { Icon } from './Icon';
 
 type Props = { listId?: string; dueToday?: boolean };
 
-function chipsOf(text: string): string[] {
+const hm = () => new Date().toTimeString().slice(0, 5);
+
+/** [date preview, other chips] — one tokenize per keystroke. `today` is the owner's day. */
+function parse(text: string, today: string): [string | null, string[]] {
   const t = tokenize(text);
   const out = t.tags.map((g) => `@${g}`);
   if (t.listName) out.unshift(`#${t.listName}`);
@@ -21,19 +26,20 @@ function chipsOf(text: string): string[] {
       out.push(describe(parseRule(t.rrule)) + (t.recurFrom === 'done' ? ' after done' : ''));
     } catch {}
   }
-  return out;
+  return [text.trim() ? previewWhen(t.text, today, hm()) : null, out];
 }
 
 export function QuickAdd({ listId, dueToday }: Props) {
   const qc = useQueryClient();
   const { mutate } = useQuickAdd();
   const [text, setText] = useState('');
-  const chips = useMemo(() => chipsOf(text), [text]);
+  const today = (): string => qc.getQueryData<Agenda>(keys.agenda(14))?.today ?? localToday();
+  const [when, chips] = useMemo(() => parse(text, today()), [text]);
 
   const submit = () => {
     const value = text.trim();
     if (!value) return;
-    const dueDate = dueToday ? (qc.getQueryData<Agenda>(keys.agenda(14))?.today ?? localToday()) : undefined;
+    const dueDate = dueToday ? today() : undefined;
     setText('');
     mutate({ text: value, listId, dueDate }, { onError: () => setText((t) => t || value) });
   };
@@ -53,20 +59,29 @@ export function QuickAdd({ listId, dueToday }: Props) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === 'Escape' && e.currentTarget.blur()}
-          placeholder="Jot it down — “call mom tomorrow 5pm @home”"
+          placeholder="Jot it down — “call mom 5pm”"
           aria-label="New task"
+          aria-describedby="quick-add-parsed"
           enterKeyHint="done"
           autoComplete="off"
         />
-        {chips.length > 0 && (
-          <ul className="chips" aria-label="Parsed">
-            {chips.map((c) => (
-              <li key={c} className="chip t-caption1">
-                {c}
-              </li>
-            ))}
-          </ul>
-        )}
+        {/* row is reserved while composing (CSS), so chips never resize the composer */}
+        <ul id="quick-add-parsed" className="chips" aria-label="Will be added as" aria-live="polite">
+          {when && (
+            <li key={`w:${when}`} className="chip chip-when t-footnote">
+              <Icon name="upcoming" size={12} />
+              {when}
+            </li>
+          )}
+          {chips.map((c) => (
+            <li key={c} className="chip t-footnote">
+              {c}
+            </li>
+          ))}
+          {!when && !chips.length && (
+            <li className="chips-hint t-footnote">Add a date, time, #list, @tag or “every …”</li>
+          )}
+        </ul>
       </div>
       <kbd className="quick-add-kbd t-caption1" aria-hidden>
         ⌘K

@@ -4,6 +4,7 @@ import { api } from './api';
 import { auth } from './auth/routes';
 import type { Env } from './env';
 import { AppError } from './lib/errors';
+import { secure } from './lib/headers';
 import { mcpHandler } from './mcp/server';
 
 const app = new Hono<{ Bindings: Env }>();
@@ -45,6 +46,6 @@ export default {
       if (providers.size > 8) providers.clear(); // hosts are bounded by routes; belt and braces
       providers.set(origin, (p = make(origin)));
     }
-    return p.fetch(req, env, ctx);
+    return p.fetch(req, env, ctx).then((res) => secure(req, res));
   },
 } satisfies ExportedHandler<Env>;

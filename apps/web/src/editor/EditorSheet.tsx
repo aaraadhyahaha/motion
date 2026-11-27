@@ -15,9 +15,6 @@ import { RepeatPicker } from './RepeatPicker';
 import { Sheet } from './Sheet';
 import { TagInput } from './TagInput';
 
-const TRASH =
-  'M4 7h16M9.5 7V4.5h5V7M6.5 7l.9 12.1a1.5 1.5 0 0 0 1.5 1.4h6.2a1.5 1.5 0 0 0 1.5-1.4L17.5 7M10 11v6M14 11v6';
-
 const FIELDS = [
   'title',
   'notes',
@@ -74,7 +71,7 @@ function seedFrom(qc: ReturnType<typeof useQueryClient>, id: string): Task | und
 export default function EditorSheet({ id, onClose }: { id: string; onClose: () => void }) {
   const qc = useQueryClient();
   const [seed] = useState(() => seedFrom(qc, id));
-  const { data: task, isError } = useTask(id, seed);
+  const { data: task, isError, refetch } = useTask(id, seed);
   const lists = useLists().data;
   const update = useUpdateTask();
   const del = useDeleteTask();
@@ -138,8 +135,8 @@ export default function EditorSheet({ id, onClose }: { id: string; onClose: () =
         onExited={onClose}
         bar={
           <header className="sheet-bar">
-            <button type="button" className="btn btn-plain sheet-del" onClick={remove} disabled={!d}>
-              <Icon d={TRASH} label="Delete task" />
+            <button type="button" className="btn btn-plain btn-danger" onClick={remove} disabled={!d}>
+              <Icon name="trash" label="Delete task" />
             </button>
             <button type="button" className="btn btn-plain" onClick={close}>
               Done
@@ -148,13 +145,21 @@ export default function EditorSheet({ id, onClose }: { id: string; onClose: () =
         }
       >
         {!d ? (
-          <p className="t-body ed-hint ed-pad" role="status">
-            {isError ? 'Couldn’t load this task.' : 'Loading…'}
-          </p>
+          <div className="ed-pad ed-status" role="status">
+            <p className="t-body">{isError ? 'This task wouldn’t open.' : 'Opening…'}</p>
+            {isError && (
+              <>
+                <p className="t-footnote">The connection dropped before the task arrived.</p>
+                <button type="button" className="btn btn-plain" onClick={() => refetch()}>
+                  Try again
+                </button>
+              </>
+            )}
+          </div>
         ) : (
           <div className="sheet-body">
             <input
-              className="t-title3 ed-title"
+              className="t-title2 ed-title"
               aria-label="Title"
               value={d.title}
               onChange={(e) => set({ title: e.target.value })}
@@ -169,14 +174,14 @@ export default function EditorSheet({ id, onClose }: { id: string; onClose: () =
             />
             <div className="ed-group">
               <div className="inset-group">
-                <label className="ed-row">
-                  <span className="ed-icon">
+                <label className="inset-item">
+                  <span className="inset-lead">
                     <span
                       className="dot"
                       style={{ '--dot': list?.color ?? 'var(--list-purple)' } as CSSProperties}
                     />
                   </span>
-                  <span className="ed-label">List</span>
+                  <span className="inset-label">List</span>
                   <select
                     className="ed-native"
                     value={d.listId}
