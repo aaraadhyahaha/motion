@@ -13,9 +13,9 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | Claude settings | `.claude/settings.json` | — | ✅ |
 | Workspaces + tooling | `package.json`, `tsconfig.base.json`, `biome.json`, `vitest.config.ts` (projects: core, worker, web), `apps/web/vitest.config.ts`, `.size-limit.js` (manifest-based budgets: initial/lazy/celebrate/SW/webmanifest), `*/package.json`, `package.json` `overrides` (audit: glob, esbuild) | — | ✅ |
 | Exact gz bytes per chunk vs baseline (`--save`, `--changed`) | `scripts/gz.mjs`, `scripts/gz-baseline.json` | — | ✅ |
-| Deploy pipeline (root `deploy` = check + test + worker deploy; worker `db:migrate:remote`, `db:export`) + deployed-origin smoke (public + `--auth`) | `package.json`, `worker/package.json`, `scripts/smoke.mjs` | `node scripts/smoke.mjs <ORIGIN> [--auth]` | 🟨 |
+| Deploy pipeline (root `deploy` = check + test + worker deploy; worker `db:migrate:remote`, `db:export`) + deployed-origin smoke (public + `--auth`) | `package.json`, `worker/package.json`, `scripts/smoke.mjs` | `node scripts/smoke.mjs <ORIGIN> [--auth]` (prod 2026-11-27: 21/21 public, 33/33 auth) | ✅ |
 | Local demo (fresh isolated D1 `worker/.wrangler/demo`, relative-date mock lists/tags/tasks, password `demo`, wrangler :8787 + vite :5173) | `scripts/demo.mjs`, `package.json` (`demo`) | `npm run demo` | ✅ |
-| Worker config (`global_fetch_strictly_public`, `preview_urls: false`, prod `OAUTH_REDIRECT_ALLOW`, D1/KV ids) | `worker/wrangler.jsonc`, `worker/.dev.vars.example` | — | 🟨 |
+| Worker config (`global_fetch_strictly_public`, `preview_urls: false`, prod `OAUTH_REDIRECT_ALLOW`, D1/KV ids) | `worker/wrangler.jsonc`, `worker/.dev.vars.example` | — | ✅ |
 
 ## #db — data
 
@@ -94,7 +94,7 @@ Status: ⬜ planned · 🟨 in progress · ✅ done
 | Accessibility (contrast of every token pair, axe on every view light/dark, 44pt targets, focus return) | `apps/web/src/styles/tokens.css`, `apps/web/src/editor/Sheet.tsx` | `apps/web/src/styles/contrast.test.ts`, `apps/web/e2e/a11y.spec.ts` | ✅ |
 | PWA manifest + SW (precache shell · CacheFirst `/assets` · NetworkFirst `/api` GET · nav denylist api/mcp/oauth/authorize/token/.well-known · `clientsClaim`) · dev proxy of worker paths | `apps/web/vite.config.ts`, `apps/web/index.html` (metas), `apps/web/public/icons/*` | `apps/web/e2e/pwa.spec.ts` (`pwa` project: built app on :8787, SW allowed) | ✅ |
 | Static security headers + CSP (`securityHeaders()` plugin → `dist/_headers`, sha256 of inline SW registration) · `.vite/` not served | `apps/web/vite.config.ts`, `apps/web/public/.assetsignore` | `apps/web/e2e/prod/pwa.spec.ts` | ✅ |
-| PWA on the deployed origin, logged out (first visit SW-controlled, offline SPA, denylist, headers) | `apps/web/e2e/prod/{prod.config,pwa.spec}.ts` | `PWA_URL=<ORIGIN> npm run test:prod -w @motion/web` | ✅ |
+| PWA on the deployed origin, logged out (first visit SW-controlled, offline SPA, denylist = never `#root`; `/api` passes through SW, headers) | `apps/web/e2e/prod/{prod.config,pwa.spec}.ts` | `PWA_URL=<ORIGIN> npm run test:prod -w @motion/web` | ✅ |
 | Logout clears SW `api` cache before the form POST | `apps/web/src/routes/Settings.tsx` | — | ✅ |
 | E2E smoke + screenshots + auth (setup project logs in → storageState; isolated D1 `worker/.wrangler/e2e`, wrangler :8787 + vite :5173, phone/desktop, SW blocked; shots → `e2e/shots/` gitignored) | `apps/web/playwright.config.ts`, `apps/web/e2e/{auth.setup,auth.spec,auth}.ts`, `apps/web/e2e/{seed,smoke.spec,shots.spec}.ts` (seed: `clearToday`, `keysReady`), `apps/web/e2e/tsconfig.json` | `npm run test:e2e -w @motion/web` | ✅ |
 

@@ -20,12 +20,12 @@
     "DEFAULT_TZ": "UTC",
     "OAUTH_REDIRECT_ALLOW": "https://claude.ai,https://claude.com"
   },
-  "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "local-dev-placeholder" }],
+  "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "3042f925a67245c8b2ed1532a0b4606c" }],
   "d1_databases": [
     {
       "binding": "DB",
       "database_name": "motion",
-      "database_id": "local-dev-placeholder",
+      "database_id": "a8d19f38-2fb4-4b21-95a5-71ab664ea830",
       "migrations_dir": "migrations"
     }
   ]

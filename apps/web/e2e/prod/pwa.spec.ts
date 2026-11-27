@@ -35,8 +35,19 @@ test('SPA routes from the SW (online + offline); denylist holds', async ({ page,
   await context.setOffline(false);
 
   for (const path of WORKER_PATHS) {
-    const w = await page.goto(path);
-    expect(w?.fromServiceWorker(), path).toBe(false);
-    expect(await page.locator('#root').count(), `${path} got the SPA shell`).toBe(0);
+    // fresh page: the logged-out SPA's own /oauth/login redirect can't race this goto. Empty-body 4xx
+    // (/mcp 401) makes goto throw ERR_HTTP_RESPONSE_CODE_FAILURE → read the navigation response event.
+    const p = await context.newPage();
+    const res = p.waitForResponse(
+      (r) => new URL(r.url()).pathname === path && r.request().isNavigationRequest(),
+    );
+    await p.goto(path).catch((e: Error) => {
+      if (!e.message.includes('ERR_HTTP_RESPONSE_CODE_FAILURE')) throw e;
+    });
+    const w = await res;
+    // /api GETs pass through the SW's NetworkFirst route by design; the invariant is "never the shell"
+    if (!path.startsWith('/api/')) expect(w.fromServiceWorker(), path).toBe(false);
+    expect(await p.locator('#root').count(), `${path} got the SPA shell`).toBe(0);
+    await p.close();
   }
 });

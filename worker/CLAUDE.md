@@ -13,9 +13,10 @@
 
 ## Runbook (prod) — run from `worker/` unless noted; ask before each
 
-- **Deploy:** `npm run deploy` (root: check + test + deploy). Then `npx wrangler versions list` → note the version id.
+- **Prod:** `https://motion.motion-worker.workers.dev` · D1 `motion` `a8d19f38-…` · KV `OAUTH_KV` `3042f925…` (full ids in `wrangler.jsonc`). wrangler `secret`/`kv`/`d1` commands need `worker/` as cwd.
+- **Deploy:** `npm run deploy` (root: check + test + deploy). Then `npx wrangler versions list` → note the version id (record it in `docs/DECISIONS.md`). Secret changes create versions too; roll back to a version that already has the current `OWNER_PW_HASH`.
 - **Migrate** (root): `npm run db:export -w @motion/worker` (backup → `backups/`), then `npm run db:migrate:remote -w @motion/worker`. Additive only; destructive = two deploys (stop reading → later drop).
-- **Rotate password** (root, own terminal, not `!`): `npm run -s auth:hash -w @motion/worker | (cd worker && npx wrangler secret put OWNER_PW_HASH)` — type, Enter, Ctrl-D. Live immediately.
+- **Rotate password** (from `worker/`, own terminal, not `!`; fish-safe, no pipe): `node scripts/hash-password.mjs > ~/.motion-hash` (type, Enter, Ctrl-D) → `npx wrangler secret put OWNER_PW_HASH < ~/.motion-hash` → `rm ~/.motion-hash`. Live immediately (makes a new version). Check: `npx wrangler secret list` → exactly one, `OWNER_PW_HASH`.
   - Revoke sessions: `npx wrangler kv key list --binding OAUTH_KV --remote --prefix sess:` → `npx wrangler kv key delete --binding OAUTH_KV --remote <key>` each.
 - **Roll back:** `npx wrangler rollback [<version-id>]` — code only; D1 is not rolled back.
   - Data: `npx wrangler d1 time-travel restore motion --timestamp <ISO>`, or execute the export into a fresh DB (`npx wrangler d1 execute <db> --remote --file <backup>`).
