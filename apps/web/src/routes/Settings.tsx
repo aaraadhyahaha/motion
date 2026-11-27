@@ -18,7 +18,7 @@ export default function Settings() {
     <>
       <PageHeader title="Settings" />
       <section className="task-section">
-        <h2 className="task-section-title t-headline">Celebrations</h2>
+        <h2 className="task-section-title t-title3">On this device</h2>
         <ul className="inset-group">
           <li>
             <label className="inset-item t-body">
@@ -35,23 +35,20 @@ export default function Settings() {
               />
             </label>
           </li>
-        </ul>
-        <p className="settings-note t-footnote">Off by default. Saved on this device only.</p>
-      </section>
-      <section className="task-section">
-        <h2 className="task-section-title t-headline">Keyboard</h2>
-        <ul className="inset-group">
           <li>
             <button type="button" className="inset-item t-body" onClick={showHelp}>
               <span className="inset-label">Keyboard shortcuts</span>
-              <kbd className="mono t-footnote">?</kbd>
+              <kbd className="settings-kbd mono t-footnote">?</kbd>
             </button>
           </li>
         </ul>
+        <p className="inset-note t-footnote">
+          The completion sound starts off and is saved on this device only.
+        </p>
       </section>
       <section className="task-section">
         <form method="post" action="/oauth/logout" className="inset-group" onSubmit={logout}>
-          <button type="submit" className="inset-item t-body settings-logout">
+          <button type="submit" className="inset-item t-body btn-danger settings-logout">
             Log out
           </button>
         </form>

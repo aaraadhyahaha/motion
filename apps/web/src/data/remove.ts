@@ -11,7 +11,7 @@ import { markDeleted, pokeSync } from './sync';
 const restore = (qc: QueryClient, id: string) =>
   api<Task>('POST', `/tasks/${id}/restore`).then(
     (t) => settle(qc, t, [keys.agendaAll, keys.tasksAll, keys.statsAll]),
-    () => toast('Couldn’t restore task'),
+    () => toast('Couldn’t bring that task back. Try again.'),
   );
 
 /** Options shared by the hook and the shortcut (`new MutationObserver(qc, deleteOptions(qc))`). */
@@ -19,7 +19,7 @@ export const deleteOptions = (qc: QueryClient) => ({
   mutationFn: (id: string) => api<void>('DELETE', `/tasks/${id}`),
   onMutate: (id: string) => optimistic(qc, (d) => removeTask(d, id)),
   onError: (_e: unknown, _id: string, snap: Awaited<ReturnType<typeof optimistic>> | undefined) =>
-    rollback(qc, snap, 'Couldn’t delete task'),
+    rollback(qc, snap, 'Couldn’t delete that task. Try again.'),
   onSuccess: (_r: void, id: string) => {
     markDeleted(id);
     void qc.invalidateQueries({ queryKey: keys.statsAll });

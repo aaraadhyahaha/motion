@@ -34,7 +34,7 @@ export function useUncomplete() {
   return useMutation({
     mutationFn: (id: string) => api<Task>('POST', `/tasks/${id}/uncomplete`),
     onMutate: (id) => optimistic(qc, (d) => patchTask(d, id, { done: false, doneAt: undefined })),
-    onError: (_e, _id, snap) => rollback(qc, snap, 'Couldn’t undo'),
+    onError: (_e, _id, snap) => rollback(qc, snap, 'Couldn’t undo that. Try again.'),
     // recurring tasks roll back to their previous date → agenda membership changes
     onSuccess: (t) => settle(qc, t, [keys.agendaAll, keys.statsAll]),
   });
@@ -46,13 +46,15 @@ export function useComplete() {
   return useMutation({
     mutationFn: (id: string) => api<Task>('POST', `/tasks/${id}/complete`),
     onMutate: (id) => {
-      toast('Done. Nicely handled.', { label: 'Undo', run: () => undo.mutate(id) });
+      // quiet on routine ticks (the stamp is the reward); Undo stays. A streak milestone rewrites the line.
+      const act = { label: 'Undo', run: () => undo.mutate(id) };
+      toast('Done.', act);
       const snap = optimistic(qc, (d) => patchTask(d, id, { done: true, doneAt: Date.now() }));
       // #anim lazy celebrate/* reads the patched caches; first completion fetches the chunk
-      void snap.then(() => import('../celebrate/run')).then((m) => m.run(qc, id));
+      void snap.then(() => import('../celebrate/run')).then((m) => m.run(qc, id, (msg) => toast(msg, act)));
       return snap;
     },
-    onError: (_e, _id, snap) => rollback(qc, snap, 'Couldn’t complete task'),
+    onError: (_e, _id, snap) => rollback(qc, snap, 'Couldn’t complete that task. Try again.'),
     // recurring tasks come back rolled forward (not done) and reappear on their new day
     onSuccess: (t) => settle(qc, t, t.rrule ? [keys.agendaAll, keys.statsAll] : [keys.statsAll]),
   });
@@ -64,7 +66,7 @@ export function useUpdateTask() {
     mutationFn: ({ id, patch }: { id: string; patch: TaskUpdate }) =>
       api<Task>('PATCH', `/tasks/${id}`, patch),
     onMutate: ({ id, patch }) => optimistic(qc, (d) => patchTask(d, id, nullsToUndefined(patch))),
-    onError: (_e, _v, snap) => rollback(qc, snap, 'Couldn’t save changes'),
+    onError: (_e, _v, snap) => rollback(qc, snap, 'Couldn’t save those changes. Try again.'),
     onSuccess: (t) => settle(qc, t, [keys.agendaAll, keys.tasksAll]),
   });
 }
@@ -74,7 +76,7 @@ export function useQuickAdd() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: QuickAdd) => api<Task>('POST', '/tasks/quick', input),
-    onError: () => toast('Couldn’t add task'),
+    onError: () => toast('Couldn’t add that task. Try again.'),
     onSuccess: (t) => settle(qc, t, [keys.agendaAll, keys.tasksAll, keys.tags]),
   });
 }

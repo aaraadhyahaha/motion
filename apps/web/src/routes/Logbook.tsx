@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { Empty } from '../components/Empty';
 import { PageHeader } from '../components/PageHeader';
 import { TaskList } from '../components/TaskList';
-import { useTasks } from '../data/queries';
+import { useTasks } from '../data/pages';
 import { fmtDayLong, localToday } from '../lib/format';
 import { useSentinel } from '../lib/useSentinel';
 
@@ -31,7 +31,7 @@ export default function Logbook() {
     <>
       <PageHeader title="Logbook" />
       {q.isError ? (
-        <Empty icon="close" title="Couldn’t load Logbook" hint="Check your connection — it’ll retry." />
+        <Empty title="The Logbook didn’t load." onRetry={q.refetch} />
       ) : (
         <>
           {[...groups].map(([day, tasks]) => (

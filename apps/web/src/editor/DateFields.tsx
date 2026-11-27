@@ -37,9 +37,9 @@ export function DateFields({ today, dueDate, dueTime, durationMin, onChange }: P
         ))}
       </div>
       <div className="inset-group">
-        <label className="ed-row">
-          <Icon name="today" className="ed-icon" />
-          <span className="ed-label">Date</span>
+        <label className="inset-item">
+          <Icon name="today" className="inset-lead" />
+          <span className="inset-label">Date</span>
           <input
             type="date"
             className="ed-native"
@@ -49,33 +49,37 @@ export function DateFields({ today, dueDate, dueTime, durationMin, onChange }: P
             }
           />
         </label>
-        <label className="ed-row">
-          <Icon d={CLOCK} className="ed-icon" />
-          <span className="ed-label">Time</span>
-          <input
-            type="time"
-            className="ed-native mono"
-            value={dueTime ?? ''}
-            disabled={!dueDate}
-            onChange={(e) => set({ dueTime: e.target.value || undefined })}
-          />
-        </label>
-        <label className="ed-row">
-          <span className="ed-icon" />
-          <span className="ed-label">Duration</span>
-          <select
-            className="ed-native"
-            value={durationMin ?? ''}
-            onChange={(e) => set({ durationMin: e.target.value ? Number(e.target.value) : undefined })}
-          >
-            <option value="">None</option>
-            {durs.map((n) => (
-              <option key={n} value={n}>
-                {fmtDuration(n)}
-              </option>
-            ))}
-          </select>
-        </label>
+        {/* progressive disclosure: time needs a day; duration only matters once there's a time */}
+        {(dueDate || dueTime) && (
+          <label className="inset-item">
+            <Icon d={CLOCK} className="inset-lead" />
+            <span className="inset-label">Time</span>
+            <input
+              type="time"
+              className="ed-native mono"
+              value={dueTime ?? ''}
+              onChange={(e) => set({ dueTime: e.target.value || undefined })}
+            />
+          </label>
+        )}
+        {(dueTime || durationMin) && (
+          <label className="inset-item">
+            <span className="inset-lead" />
+            <span className="inset-label">Duration</span>
+            <select
+              className="ed-native"
+              value={durationMin ?? ''}
+              onChange={(e) => set({ durationMin: e.target.value ? Number(e.target.value) : undefined })}
+            >
+              <option value="">None</option>
+              {durs.map((n) => (
+                <option key={n} value={n}>
+                  {fmtDuration(n)}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
       </div>
     </div>
   );

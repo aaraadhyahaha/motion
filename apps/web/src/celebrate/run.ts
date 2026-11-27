@@ -1,38 +1,17 @@
-// #anim completion celebration entry (lazy; loaded by useComplete on first completion, idle-prefetched).
-// Reads only cached data (agenda, stats) — never fetches to celebrate. Keys are literal (= data/keys.ts):
+// #anim completion feedback entry (lazy; loaded by useComplete on first completion, idle-prefetched).
+// Ink stamp: a routine tick is ring bloom + strike (CSS) + haptic. No confetti on routine ticks.
+// "Today's done" is authored in the teacup empty state (Empty + celebrate.css). Streak milestones earn the
+// one burst plus a toast line (via `say`, injected so no entry module is imported here).
+// Reads only cached data (agenda, stats) — never fetches. Keys are literal (= data/keys.ts):
 // importing shared entry modules here makes Rolldown split them into extra initial chunks.
 import type { Agenda, Stats } from '@motion/core/schemas';
 import type { QueryClient } from '@tanstack/react-query';
-import { decide, lines } from './decide';
+import { decide, note } from './decide';
 import { burst } from './particles';
 import { chime, soundOn } from './sound';
 import '../styles/celebrate.css';
 
-const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-function card(text: string[]) {
-  document.querySelector('.celebrate-card')?.remove();
-  const el = document.createElement('div');
-  el.className = 'celebrate-card';
-  el.setAttribute('role', 'status');
-  for (const [i, s] of text.entries()) {
-    const p = document.createElement('p');
-    p.className = i ? 't-headline' : 'celebrate-title';
-    p.textContent = s;
-    el.append(p);
-  }
-  const close = () => {
-    removeEventListener('keydown', esc);
-    el.remove();
-  };
-  const esc = (e: KeyboardEvent) => e.key === 'Escape' && close();
-  addEventListener('keydown', esc);
-  el.addEventListener('click', close);
-  el.addEventListener('animationend', (e) => e.animationName === 'celebrate-out' && close());
-  document.body.append(el);
-}
-
-export function run(qc: QueryClient, id: string) {
+export function run(qc: QueryClient, id: string, say: (msg: string) => void) {
   navigator.vibrate?.(10);
   const a = qc.getQueryData<Agenda>(['agenda', 14]);
   const today = a?.today ?? '';
@@ -51,12 +30,11 @@ export function run(qc: QueryClient, id: string) {
     doneToday: st?.perDay[today],
     streak: st?.streak,
   });
-  const text = lines(m);
-  if (soundOn()) chime(text.length > 0);
-  if (!reduced()) {
-    const box = document.querySelector(`[data-id="${CSS.escape(id)}"] .check`)?.getBoundingClientRect();
-    if (box) burst(box.x + box.width / 2, box.y + box.height / 2, text.length ? 30 : 36);
-    if (text.length) for (const f of [0.2, 0.5, 0.8]) burst(innerWidth * f, innerHeight * 0.75, 30, 0);
-  }
-  if (text.length) card(text);
+  if (soundOn()) chime(m.todayDone || m.milestone > 0);
+  const line = note(m);
+  if (!line) return;
+  say(line);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const box = document.querySelector(`[data-id="${CSS.escape(id)}"] .check`)?.getBoundingClientRect();
+  if (box) burst(box.x + box.width / 2, box.y + box.height / 2, 36);
 }

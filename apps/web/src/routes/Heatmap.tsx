@@ -17,12 +17,24 @@ export const Heatmap = memo(function Heatmap({ perDay, today }: Props) {
     return { day, c, l: c && Math.min(4, Math.ceil((c / max) * 4)) };
   });
   const total = cells.reduce((s, x) => s + x.c, 0);
+  const active = cells.filter((x) => x.c).length;
+  const sparse = active < 14; // fewer than two weeks of marks
 
   return (
-    <div className="heatmap" role="img" aria-label={`${total} completions in the last ${WEEKS} weeks`}>
-      {cells.map(({ day, c, l }) => (
-        <span key={day} className="heat" data-l={l} title={`${c} · ${fmtDay(day)}`} />
-      ))}
-    </div>
+    <>
+      <div
+        className="heatmap"
+        role="img"
+        aria-label={`${total} completions in the last ${WEEKS} weeks`}
+        data-sparse={sparse || undefined}
+      >
+        {cells.map(({ day, c, l }) => (
+          <span key={day} className="heat" data-l={l || undefined} title={`${c} · ${fmtDay(day)}`} />
+        ))}
+      </div>
+      {sparse && (
+        <p className="heat-note t-footnote">A few marks so far. The grid fills in as you finish things.</p>
+      )}
+    </>
   );
 });

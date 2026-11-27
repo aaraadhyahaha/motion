@@ -40,9 +40,25 @@ export function showHelp() {
     // HELP is a static constant (no user text), so string HTML is safe and smallest
     help.innerHTML = `<h2 id="help-title" class="t-title2">Keyboard shortcuts</h2><dl>${HELP.map(
       ([k, d]) => `<dt class="mono t-subhead">${k}</dt><dd class="t-subhead">${d}</dd>`,
-    ).join('')}</dl><form method="dialog"><button class="btn btn-tint">Done</button></form>`;
-    help.addEventListener('click', (e) => e.target === help && help?.close());
-    document.body.append(help);
+    ).join('')}</dl><form method="dialog"><button class="btn btn-plain">Done</button></form>`;
+    // every close path (Esc, Done, backdrop) plays `.closing` first, then close() on its animationend
+    const d = help;
+    const shut = (e?: Event) => {
+      e?.preventDefault();
+      if (!d.open || d.classList.contains('closing')) return;
+      d.classList.add('closing');
+      const done = (a: AnimationEvent) => {
+        if (a.animationName !== 'help-out') return;
+        d.removeEventListener('animationend', done);
+        d.classList.remove('closing');
+        d.close();
+      };
+      d.addEventListener('animationend', done);
+    };
+    d.addEventListener('cancel', shut);
+    d.addEventListener('submit', shut);
+    d.addEventListener('click', (e) => e.target === d && shut());
+    document.body.append(d);
   }
   if (!help.open) help.showModal(); // native: focus trap, Esc, focus return
 }

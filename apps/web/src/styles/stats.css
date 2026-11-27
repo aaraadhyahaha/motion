@@ -19,8 +19,6 @@
 }
 .tile-value {
   color: var(--tint-ink);
-  font: 400 40px / 1 var(--font-serif);
-  font-variant-numeric: tabular-nums;
 }
 
 .stats-card {
@@ -40,8 +38,16 @@
 }
 .heat {
   aspect-ratio: 1;
-  border-radius: 3px;
+  border-radius: var(--r-heat);
   background: var(--fill4);
+}
+/* sparse data: quiet the grid so a handful of marks doesn't read as a broken chart */
+.heatmap[data-sparse] .heat:not([data-l]) {
+  opacity: 0.6;
+}
+.heat-note {
+  margin-top: var(--s-3);
+  color: var(--label2);
 }
 .heat[data-l="1"] {
   background: color-mix(in srgb, var(--tint) 30%, var(--fill4));

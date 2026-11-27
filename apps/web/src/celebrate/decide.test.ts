@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { decide, type Facts, lines, MILESTONES } from './decide';
+import { decide, type Facts, MILESTONES, note } from './decide';
 
 const F: Facts = { onToday: true, inToday: true, openToday: 2 };
 
 describe('celebrate/decide', () => {
-  it('plain completion → burst only', () => {
+  it('plain completion → nothing extra (ring bloom + strike are CSS)', () => {
     const m = decide(F);
     expect(m).toEqual({ todayDone: false, milestone: 0 });
-    expect(lines(m)).toEqual([]);
+    expect(note(m)).toBe('');
   });
 
   it('last open Today row on Today → today-done', () => {
@@ -24,7 +24,8 @@ describe('celebrate/decide', () => {
     expect(decide({ ...F }).milestone).toBe(0); // stats not cached → never guess
   });
 
-  it('both at once → one card, two lines', () => {
-    expect(lines(decide({ ...F, openToday: 0, streak: 29 }))).toEqual(['Today’s done.', '30-day streak.']);
+  it('milestone → a toast line; today-done alone → none (the teacup carries it)', () => {
+    expect(note(decide({ ...F, openToday: 0, streak: 29 }))).toBe('30-day streak. Nicely kept.');
+    expect(note(decide({ ...F, openToday: 0 }))).toBe('');
   });
 });

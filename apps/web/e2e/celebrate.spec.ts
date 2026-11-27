@@ -1,4 +1,4 @@
-// #anim e2e: burst canvas, "Today's done" card, rAF stops after particles die, reduced motion, sound setting,
+// #anim e2e: ink-stamp ticks (no confetti), "Today's done" teacup moment, reduced motion, sound setting,
 // and zero idle CPU (no rAF / intervals while nothing happens).
 import { expect, type Page, test } from '@playwright/test';
 import { clearToday, create, today } from './seed';
@@ -32,23 +32,20 @@ test.beforeEach(async ({ page, request }) => {
   page.on('console', (m) => m.text().startsWith('INTERVAL') && console.log(m.text()));
 });
 
-test('burst, then Today’s done card; loop stops; idle is idle', async ({ page }) => {
+test('routine tick is a stamp (no confetti); last tick inks Today’s done; idle is idle', async ({ page }) => {
   await page.goto('/');
   const main = page.getByRole('main');
   await main.getByRole('checkbox', { name: 'Party one' }).click();
-  const canvas = page.locator('.celebrate-canvas');
-  await expect(canvas).toBeVisible();
-  await expect(canvas).toBeHidden({ timeout: 4000 }); // all particles dead → canvas hidden
-  const settled = await counts(page);
-  await page.waitForTimeout(1500);
-  expect((await counts(page)).raf).toBe(settled.raf); // no rAF loop left running
+  await expect(page.getByText('Done.', { exact: true })).toBeVisible(); // quiet toast, Undo kept
+  await page.waitForTimeout(1200);
+  await expect(page.locator('.celebrate-canvas')).toHaveCount(0); // no burst on routine ticks
 
   await main.getByRole('checkbox', { name: 'Party two' }).click();
-  const card = page.getByRole('status').filter({ hasText: 'Today’s done.' });
-  await expect(card).toBeVisible();
-  await expect(card).toBeHidden({ timeout: 5000 }); // CSS hold → fade → removed
+  const done = page.getByRole('status').filter({ hasText: 'Today’s done.' });
+  await expect(done).toHaveCount(1); // one announcement: the teacup, no floating card
+  await expect(done).toBeVisible({ timeout: 3000 });
+  await expect(done).toBeVisible(); // stays (part of the page, not a timed card)
 
-  await expect(canvas).toBeHidden({ timeout: 4000 });
   const idle = await counts(page);
   await page.waitForTimeout(2000);
   const after = await counts(page);
@@ -56,7 +53,7 @@ test('burst, then Today’s done card; loop stops; idle is idle', async ({ page 
   expect(after.int).toBe(0); // the app never uses setInterval
 });
 
-test('reduced motion: no canvas, card still fades in', async ({ page }) => {
+test('reduced motion: Today’s done still fades in', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   const main = page.getByRole('main');

@@ -154,7 +154,12 @@ export default defineConfig({
     manifest: true,
     // #perf JS deps of lazy chunks load on demand (idle prefetch warms them); only CSS stays in the
     // preload lists so code-split CSS still arrives with its chunk. Cuts per-import dep arrays from entry.
-    modulePreload: { resolveDependencies: (_f, deps) => deps.filter((d) => d.endsWith('.css')) },
+    // No modulepreload polyfill (−240 B initial): every es2022 target supports it natively, and where it
+    // doesn't the hint is just ignored.
+    modulePreload: {
+      polyfill: false,
+      resolveDependencies: (_f, deps) => deps.filter((d) => d.endsWith('.css')),
+    },
     rollupOptions: {
       output: {
         entryFileNames: 'assets/entry-[hash].js',

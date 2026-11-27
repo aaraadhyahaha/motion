@@ -58,9 +58,9 @@ export function RepeatPicker({ rrule, recurFrom, onChange }: Props) {
   return (
     <div className="ed-group">
       <div className="inset-group">
-        <label className="ed-row">
-          <Icon name="repeat" className="ed-icon" />
-          <span className="ed-label">Repeat</span>
+        <label className="inset-item">
+          <Icon name="repeat" className="inset-lead" />
+          <span className="inset-label">Repeat</span>
           <select className="ed-native" value={mode} onChange={(e) => pick(e.target.value)}>
             <option value="">Never</option>
             {PRESETS.map(([label, r]) => (
@@ -72,9 +72,9 @@ export function RepeatPicker({ rrule, recurFrom, onChange }: Props) {
           </select>
         </label>
         {rule && mode === 'custom' && (
-          <label className="ed-row">
-            <span className="ed-icon" />
-            <span className="ed-label">Every</span>
+          <label className="inset-item">
+            <span className="inset-lead" />
+            <span className="inset-label">Every</span>
             <input
               type="number"
               inputMode="numeric"
@@ -101,7 +101,7 @@ export function RepeatPicker({ rrule, recurFrom, onChange }: Props) {
           </label>
         )}
         {rule && mode === 'custom' && rule.freq === 'WEEKLY' && (
-          <div className="ed-row ed-days" role="group" aria-label="On days">
+          <div className="inset-item ed-days" role="group" aria-label="On days">
             {WEEK.map((wd) => (
               <button
                 key={wd}
@@ -117,9 +117,9 @@ export function RepeatPicker({ rrule, recurFrom, onChange }: Props) {
           </div>
         )}
         {rule && mode === 'custom' && rule.freq === 'MONTHLY' && (
-          <label className="ed-row">
-            <span className="ed-icon" />
-            <span className="ed-label">On day</span>
+          <label className="inset-item">
+            <span className="inset-lead" />
+            <span className="inset-label">On day</span>
             <select
               className="ed-native mono"
               value={rule.byMonthDay?.[0] ?? ''}
@@ -140,21 +140,22 @@ export function RepeatPicker({ rrule, recurFrom, onChange }: Props) {
             </select>
           </label>
         )}
-        {rule && (
-          <label className="ed-row">
-            <span className="ed-icon" />
-            <span className="ed-label">From completion</span>
+        {/* advanced: only under Custom (or when already set), so presets stay one decision */}
+        {rule && (mode === 'custom' || recurFrom === 'done') && (
+          <label className="inset-item">
+            <span className="inset-lead" />
+            <span className="inset-label">From completion</span>
             <input
               type="checkbox"
               role="switch"
-              className="ed-switch"
+              className="switch"
               checked={recurFrom === 'done'}
               onChange={(e) => onChange({ rrule, recurFrom: e.target.checked ? 'done' : 'due' })}
             />
           </label>
         )}
       </div>
-      {rule && <p className="t-footnote ed-hint">{describe(rule)}</p>}
+      {rule && <p className="t-footnote inset-note">{describe(rule)}</p>}
     </div>
   );
 }

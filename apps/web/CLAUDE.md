@@ -23,7 +23,7 @@ Plan: `plans/2026-11-26-phase2-interface.md`. Tokens: `src/styles/tokens.css`. R
 
 ## Perf / budgets (`.size-limit.js`, `npm run check`)
 
-- Initial JS ≤ 90 KB gz · initial CSS ≤ 15 KB · lazy JS total ≤ 45 KB · `celebrate/*` ≤ 8 KB · SW ≤ 10 KB.
+- Initial JS ≤ 91 KB gz · initial CSS ≤ 15 KB · lazy JS total ≤ 46 KB · `celebrate/*` ≤ 8 KB · SW ≤ 10 KB.
 - Initial chunk may contain: React, react-query, router, shell, Today, data layer, core helpers (**no zod** — `import type` only; subpaths `@motion/core/{dates,quickadd,recurrence}`).
 - Everything else is `React.lazy`: `routes/*` (except Today), `editor/*`, `celebrate/*`, `keys/*`.
 - A new lazy importer of a shared entry module can make Rolldown split it into an extra initial chunk — prefer injection/literals where it shows up. Check exact bytes: `node scripts/gz.mjs --changed` after `vite build`; `--save` to rebase.

@@ -1,4 +1,5 @@
-// #task #ui #anim task list: memo rows, stable keys, done rows linger ~600 ms → fade/scale out → siblings FLIP up.
+// #task #ui #anim task list: memo rows, stable keys, done rows linger ~600 ms → leave → siblings + card FLIP up.
+// Recurring rows roll forward on the server (not done, new date): a done snapshot (ghost) lingers in their place.
 import type { Task } from '@motion/core/schemas';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useComplete, useUncomplete } from '../data/mutations';
@@ -25,9 +26,11 @@ type Props = {
   sticky?: boolean;
   /** Done rows stay put — no linger/leave (Logbook). */
   keepDone?: boolean;
+  /** Current list view: rows of this list skip the redundant "• List" meta. */
+  listId?: string;
 };
 
-export function TaskList({ tasks, title, tone, showDate, sticky, keepDone }: Props) {
+export function TaskList({ tasks, title, tone, showDate, sticky, keepDone, listId }: Props) {
   const { data: lists } = useLists();
   const byId = useMemo(() => new Map(lists?.map((l) => [l.id, l])), [lists]);
   const { mutate: complete } = useComplete();
@@ -35,14 +38,31 @@ export function TaskList({ tasks, title, tone, showDate, sticky, keepDone }: Pro
   const [leaving, setLeaving] = useState<Ids>(new Set());
   const [gone, setGone] = useState<Ids>(new Set());
   const ref = useRef<HTMLUListElement>(null);
+  /** id → [done snapshot, index]: shown while the cache says rolled forward (or filtered out). */
+  const ghosts = useRef(new Map<string, [Task, number]>());
   useFlip(ref);
+
+  const view = useMemo(() => {
+    if (keepDone) return tasks;
+    const g = ghosts.current;
+    const ids = new Set<string>();
+    const v = tasks.map((t) => {
+      ids.add(t.id);
+      const s = g.get(t.id)?.[0];
+      return s && !t.done && t.dueDate !== s.dueDate && !gone.has(t.id) ? s : t;
+    });
+    for (const [id, [s, i]] of g) if (!ids.has(id) && !gone.has(id)) v.splice(i, 0, s);
+    return v;
+  }, [tasks, gone, keepDone]);
 
   // Schedule the leave for freshly completed rows; forget ids that were un-completed (undo).
   useEffect(() => {
     if (keepDone) return;
     const timers: ReturnType<typeof setTimeout>[] = [];
-    for (const t of tasks) {
+    for (const [i, t] of view.entries()) {
+      if (t.done && Date.now() - (t.doneAt ?? 0) < LINGER * 2) ghosts.current.set(t.id, [t, i]);
       if (!t.done) {
+        ghosts.current.delete(t.id);
         setLeaving((s) => minus(s, t.id));
         setGone((s) => minus(s, t.id));
       } else if (!leaving.has(t.id) && !gone.has(t.id)) {
@@ -53,13 +73,14 @@ export function TaskList({ tasks, title, tone, showDate, sticky, keepDone }: Pro
     return () => {
       for (const x of timers) clearTimeout(x);
     };
-  }, [tasks, leaving, gone, keepDone]);
+  }, [view, leaving, gone, keepDone]);
 
   const onToggle = useCallback(
     (id: string, done: boolean) => (done ? complete(id) : uncomplete(id)),
     [complete, uncomplete],
   );
   const onLeft = useCallback((id: string) => {
+    ghosts.current.delete(id);
     setGone((s) => plus(s, id));
     setLeaving((s) => minus(s, id));
   }, []);
@@ -67,7 +88,7 @@ export function TaskList({ tasks, title, tone, showDate, sticky, keepDone }: Pro
   const now = Date.now();
   const rows = keepDone
     ? tasks
-    : tasks.filter(
+    : view.filter(
         (t) => !t.done || leaving.has(t.id) || (!gone.has(t.id) && now - (t.doneAt ?? 0) < LINGER * 2),
       );
   if (!rows.length) return null;
@@ -84,7 +105,7 @@ export function TaskList({ tasks, title, tone, showDate, sticky, keepDone }: Pro
           <TaskRow
             key={t.id}
             task={t}
-            list={byId.get(t.listId)}
+            list={t.listId === listId ? undefined : byId.get(t.listId)}
             showDate={showDate}
             leaving={leaving.has(t.id)}
             onToggle={onToggle}

@@ -18,8 +18,8 @@
   --t-large-title-ls: -0.6px;
   --t-title1-size: 28px;
   --t-title1-lh: 34px;
-  --t-title1-wt: 700;
-  --t-title1-ls: 0.38px;
+  --t-title1-wt: 400; /* title1–3 are one serif family; weight steps come from size */
+  --t-title1-ls: -0.3px;
   --t-title2-size: 25px;
   --t-title2-lh: 30px;
   --t-title2-wt: 400;
@@ -28,6 +28,11 @@
   --t-title3-lh: 27px;
   --t-title3-wt: 400;
   --t-title3-ls: -0.1px;
+  /* stat numerals: sans + tabular (the serif "1" reads as "l") */
+  --t-numeral-size: 40px;
+  --t-numeral-lh: 44px;
+  --t-numeral-wt: 500;
+  --t-numeral-ls: -0.8px;
   /* eyebrow above large titles */
   --t-eyebrow-size: 11.5px;
   --t-eyebrow-lh: 16px;
@@ -105,7 +110,11 @@
   --list-blue: light-dark(#4b58a6, #9aa6f0);
   --list-purple: light-dark(#8c4777, #d48cbd);
 
-  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--tint) 50%, transparent);
+  /* focus ring: opaque outline colour (≥3:1 on every surface: light 4.74–6.07, dark 5.08–8.09).
+     Drawn with `outline`, so it follows each element's radius and survives forced-colors. */
+  --focus-ring: var(--tint-ink);
+  /* instructional placeholder hints (quick add, tags, search): ≥4.5 incl. on --fill3 fields */
+  --placeholder: light-dark(rgb(76 62 48 / 0.78), rgb(243 236 226 / 0.6));
 
   /* ── Materials (fixed chrome only) ── */
   --material-bar-bg: light-dark(rgb(247 242 233 / 0.84), rgb(30 27 23 / 0.84));
@@ -212,8 +221,84 @@
   --spring-smooth: var(--dur-smooth) var(--ease-spring);
   --spring-bouncy: var(--dur-bouncy) var(--ease-bouncy);
   --fade: var(--dur-fade) var(--ease-out);
+
+  /* Agent 2 tokens — overlay motion system (sheet, dialog, toast, press). Mirror in src/lib/springs.ts */
+  --ease-in: cubic-bezier(0.4, 0, 1, 1); /* exits: accelerate away */
+  --dur-press: 100ms; /* :active feedback lands ≤120ms; release on --spring-snappy */
+  --press: var(--dur-press) var(--ease-out);
+  --dur-overlay-in: 350ms; /* sheet spring k400/c40 settle (critically damped → --ease-spring) */
+  --dur-overlay-out: 200ms; /* exits faster than entries */
+  --dur-overlay-pop: 250ms; /* centered sheet / dialog scale-in */
+  --overlay-in: var(--dur-overlay-in) var(--ease-spring);
+  --overlay-out: var(--dur-overlay-out) var(--ease-in);
+  --overlay-pop: var(--dur-overlay-pop) var(--ease-spring);
+  --overlay-scale: 0.96; /* centered sheet / dialog start scale */
+  --dur-scrim: 200ms; /* scrim/backdrop opacity, linear; kept under reduced motion (fade) */
+  --dur-toast-in: 250ms;
+  --dur-toast-out: 150ms;
+  --toast-in: var(--dur-toast-in) var(--ease-out);
+  --toast-out: var(--dur-toast-out) var(--ease-in);
+  --toast-rise: 12px; /* enter offset */
+  --toast-drop: 8px; /* exit offset */
+  /* inverted surface: Undo ≥4.5:1 (see contrast.test.ts) */
+  --toast-bg: light-dark(#2b2520, #efe4d2);
+  --toast-label: light-dark(#f6efe4, #231d16);
+  --toast-action: light-dark(#f2a582, #9a3d1a);
 }
 
+/* agent3 tokens — Atelier extension: ink rules, switch, chips, swash, inset rows */
+:root {
+  --rule: 1px dashed var(--separator); /* the one separator: rows, inset groups, ruled fields */
+  --lead-w: var(--s-6); /* leading icon/dot column in inset rows */
+  --switch-gap: 2px;
+  --switch-edge: light-dark(rgb(76 62 48 / 0.6), rgb(243 236 226 / 0.42)); /* off track ≥3:1 on cards */
+  --switch-knob: light-dark(#fffdf8, #f3ede3);
+  --shadow-knob: 0 1px 3px light-dark(rgb(90 60 30 / 0.3), rgb(0 0 0 / 0.5));
+  --chip-bg: color-mix(in srgb, var(--tint) 12%, transparent); /* value chips: tags, parsed quick-add */
+  --chip-ink: var(--tint-ink);
+  --chip-pad: var(--s-3);
+  --swash-w: 140px;
+  --swash-h: 12px;
+}
+
+/* agent1 tokens — completion (ink stamp) + navigation motion */
+:root {
+  --dur-check: 350ms; /* fill ≈ spring k500/c30 (ζ≈0.67, same shape as --ease-bouncy) */
+  --check-fill: var(--dur-check) var(--ease-bouncy);
+  --dur-strike: 220ms;
+  --strike-delay: 80ms; /* strike follows the fill */
+  --strike-w: 1.5px;
+  --strike-y: 54%; /* line-through sits a hair below the line box middle */
+  --dur-leave: 200ms;
+  --row-leave: var(--dur-leave) var(--ease-in);
+  --leave-x: 8px;
+  --row-leave-scale: 0.98;
+  --dur-enter: 250ms;
+  --enter-y: -6px;
+  --dur-route-in: 200ms;
+  --route-rise: 4px;
+  --dur-ink: 650ms; /* "Today's done": serif title inks in */
+  --dur-steam: 900ms;
+  --steam-stagger: 120ms;
+  --moment-delay: 850ms; /* linger 600 + leave 200 → the last row is gone */
+  --cup-size: 56px; /* teacup box (Empty); steam layers share it */
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-check: 0ms;
+    --dur-strike: 0ms;
+    --leave-x: 0px;
+    --row-leave-scale: 1;
+    --enter-y: 0px;
+    --route-rise: 0px;
+    /* fades stay: --dur-leave / --dur-enter / --dur-route-in drive opacity only now */
+  }
+}
+
+/* any stored hex is a light-mode ink: lift it toward bone in dark (≈6:1 on --bg) */
+[style*="--dot: #" i] {
+  --ink: light-dark(var(--dot), color-mix(in srgb, var(--dot) 70%, white));
+}
 /* stored list colors are legacy Apple light hexes → Atelier inks (CSS-only, no JS map) */
 [style*="ff3b30" i] {
   --ink: var(--list-red);
@@ -240,6 +325,13 @@
     --dur-smooth: 0ms;
     --dur-bouncy: 0ms;
     /* --dur-fade kept: opacity fades stay */
+    /* Agent 2 tokens: spatial overlay durations → 0; toast/dialog keep their fade, lose movement */
+    --dur-overlay-in: 0ms;
+    --dur-overlay-out: 0ms;
+    --dur-overlay-pop: 0ms;
+    --overlay-scale: 1;
+    --toast-rise: 0px;
+    --toast-drop: 0px;
   }
 }
 
@@ -271,7 +363,7 @@
   letter-spacing: var(--t-large-title-ls);
 }
 .t-title1 {
-  font: var(--t-title1-wt) var(--t-title1-size) / var(--t-title1-lh) var(--font-display);
+  font: var(--t-title1-wt) var(--t-title1-size) / var(--t-title1-lh) var(--font-serif);
   letter-spacing: var(--t-title1-ls);
 }
 .t-title2 {
@@ -326,4 +418,29 @@
   letter-spacing: var(--t-eyebrow-ls);
   text-transform: uppercase;
   color: var(--tint-ink);
+}
+.t-numeral {
+  font: var(--t-numeral-wt) var(--t-numeral-size) / var(--t-numeral-lh) var(--font-display);
+  letter-spacing: var(--t-numeral-ls);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* agent4 tokens — focus ring geometry, search clear glyph, quick-add chip row */
+:root {
+  --focus-w: 2px;
+  --focus-offset: 2px; /* outside the control */
+  --focus-inset: -2px; /* inside, for controls flush with a clipping card edge */
+  --search-clear: 18px;
+  /* search clear: a disk with an × knocked out (painted via mask, so it takes any ink) */
+  --search-clear-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cmask id='m'%3E%3Ccircle cx='10' cy='10' r='10' fill='white'/%3E%3Cpath d='M6.5 6.5l7 7M13.5 6.5l-7 7' stroke='black' stroke-width='1.8' stroke-linecap='round'/%3E%3C/mask%3E%3Crect width='20' height='20' mask='url(%23m)'/%3E%3C/svg%3E");
+  --chip-row: 18px; /* one t-footnote chip line, reserved so the composer never jumps */
+  --dur-chip: 180ms; /* UI feedback: ≤200ms ease-out, no overshoot */
+  --chip-from: 0.92;
+  --chip-in: var(--dur-chip) var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --chip-in: var(--dur-fade) linear; /* chip keeps its fade, loses the scale */
+    --chip-from: 1;
+  }
 }

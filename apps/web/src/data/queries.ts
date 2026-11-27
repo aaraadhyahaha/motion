@@ -1,25 +1,15 @@
 // #api read hooks. Types only from core (no zod in the browser).
-import type { Agenda, List, Page, Settings, Stats, Tag, Task } from '@motion/core/schemas';
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import type { Agenda, List, Settings, Stats, Tag, Task } from '@motion/core/schemas';
+import { useQuery } from '@tanstack/react-query';
 import { api, qs } from './api';
-import { keys, type TaskFilter } from './keys';
+import { keys } from './keys';
 
-const PAGE = 50;
+// paged task reads (useTasks) live in ./pages: lazy routes only (#perf)
 
 export const useAgenda = (days = 14) =>
   useQuery({
     queryKey: keys.agenda(days),
     queryFn: ({ signal }) => api<Agenda>('GET', `/agenda${qs({ days })}`, undefined, signal),
-  });
-
-export const useTasks = (f: TaskFilter, enabled = true) =>
-  useInfiniteQuery({
-    queryKey: keys.tasks(f),
-    enabled,
-    initialPageParam: undefined as string | undefined,
-    queryFn: ({ pageParam, signal }) =>
-      api<Page<Task>>('GET', `/tasks${qs({ ...f, cursor: pageParam, limit: PAGE })}`, undefined, signal),
-    getNextPageParam: (last) => last.next,
   });
 
 /** `seed` (a cached row) renders instantly; it's marked stale so the full task still loads. */
